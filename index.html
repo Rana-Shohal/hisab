@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1a1a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HisabNikash">
+<link rel="manifest" href="manifest.json">
+<title>হিসাব নিকাশ</title>
+<style>
+  :root {
+    --bg: #0f0f1a;
+    --surface: #1a1a2e;
+    --card: #16213e;
+    --accent: #e94560;
+    --accent2: #0f3460;
+    --teal: #00b4d8;
+    --green: #06d6a0;
+    --yellow: #ffd166;
+    --text: #eaeaea;
+    --text-muted: #8892a4;
+    --border: #2a2a4a;
+    --input-bg: #0d0d1f;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+    font-size: 15px;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    background: var(--surface);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-title { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+  .topbar-title span { color: var(--accent); }
+  .sync-badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .sync-badge.online { background: rgba(6,214,160,0.15); color: var(--green); }
+  .sync-badge.offline { background: rgba(233,69,96,0.15); color: var(--accent); }
+  .sync-badge::before { content: '●'; font-size: 8px; }
+
+  /* ── NAV TABS ── */
+  .nav-tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    flex: 1;
+    min-width: 90px;
+    padding: 13px 10px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .nav-tab .tab-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+
+  /* ── PAGE ── */
+  .page { display: none; padding: 16px; }
+  .page.active { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+
+  /* ── FORM ── */
+  .form-group { margin-bottom: 14px; }
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  label .req { color: var(--accent); }
+  input, select, textarea {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus { border-color: var(--teal); }
+  input.error { border-color: var(--accent); }
+  .field-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+  .field-error { color: var(--accent); font-size: 12px; margin-top: 4px; display: none; }
+  .field-error.show { display: block; }
+  .autofill-badge {
+    font-size: 11px;
+    background: rgba(0,180,216,0.15);
+    color: var(--teal);
+    padding: 3px 8px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-top: 4px;
+  }
+  .amount-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* ── SMS OPTION ── */
+  .sms-option {
+    background: rgba(233,69,96,0.08);
+    border: 1.5px solid rgba(233,69,96,0.3);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .sms-option.show { display: block; }
+  .sms-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .sms-checkbox-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--accent);
+  }
+  .sms-label { font-size: 14px; font-weight: 600; color: var(--text); }
+  .sms-preview {
+    margin-top: 10px;
+    background: var(--input-bg);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+    display: none;
+    line-height: 1.5;
+  }
+  .sms-preview.show { display: block; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #c41e3a);
+    color: #fff;
+  }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-teal {
+    background: linear-gradient(135deg, var(--teal), #0077b6);
+    color: #fff;
+  }
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text);
+  }
+  .btn-sm {
+    width: auto;
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+  .btn-green { background: linear-gradient(135deg, var(--green), #04a177); color: #fff; }
+
+  /* ── OFFLINE QUEUE BADGE ── */
+  .queue-notice {
+    background: rgba(255,209,102,0.12);
+    border: 1px solid rgba(255,209,102,0.3);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--yellow);
+    margin-bottom: 14px;
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  .queue-notice.show { display: flex; }
+
+  /* ── LOAN DASHBOARD ── */
+  .loan-section-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 20px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .loan-item {
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .loan-item-name { font-weight: 700; font-size: 15px; }
+  .loan-item-phone { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .loan-amounts { text-align: right; }
+  .loan-remaining { font-size: 18px; font-weight: 800; }
+  .loan-remaining.give { color: var(--green); }
+  .loan-remaining.take { color: var(--accent); }
+  .loan-remaining.credit { color: var(--yellow); }
+  .loan-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+  .empty-state .empty-icon { font-size: 48px; display: block; margin-bottom: 10px; }
+
+  /* ── HISTORY ── */
+  .history-item {
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--border);
+  }
+  .history-item.take { border-left-color: var(--green); }
+  .history-item.give { border-left-color: var(--accent); }
+  .history-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .history-cat { font-size: 12px; font-weight: 700; color: var(--teal); text-transform: uppercase; }
+  .history-amount { font-weight: 800; font-size: 16px; }
+  .history-amount.take { color: var(--green); }
+  .history-amount.give { color: var(--accent); }
+  .history-name { font-size: 14px; margin-top: 4px; }
+  .history-date { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+  .history-pending {
+    font-size: 11px;
+    background: rgba(255,209,102,0.15);
+    color: var(--yellow);
+    padding: 2px 7px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 4px;
+  }
+
+  /* ── FILTER ROW ── */
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    flex-shrink: 0;
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1.5px solid var(--border);
+    color: var(--text-muted);
+    cursor: pointer;
+    background: transparent;
+  }
+  .filter-chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 999;
+    white-space: nowrap;
+    max-width: 90vw;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.success { border-color: var(--green); color: var(--green); }
+  .toast.error { border-color: var(--accent); color: var(--accent); }
+  .toast.info { border-color: var(--teal); color: var(--teal); }
+
+  /* ── LOADING ── */
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  /* Settings page */
+  .setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .setting-label { font-size: 14px; }
+  .setting-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .setting-input {
+    width: 200px;
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  /* Loan filter tabs */
+  .loan-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .loan-tab {
+    flex: 1;
+    min-width: 100px;
+    padding: 12px 8px;
+    border-radius: var(--radius-sm);
+    text-align: center;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  .loan-tab.active-give { border-color: var(--green); color: var(--green); background: rgba(6,214,160,0.1); }
+  .loan-tab.active-take { border-color: var(--accent); color: var(--accent); background: rgba(233,69,96,0.1); }
+  .loan-tab.active-credit { border-color: var(--yellow); color: var(--yellow); background: rgba(255,209,102,0.1); }
+
+  select option { background: #1a1a2e; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-title">হিসাব<span>নিকাশ</span></div>
+  <div id="syncBadge" class="sync-badge offline">অফলাইন</div>
+</div>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="showPage('form')">
+    <span class="tab-icon">✏️</span>এন্ট্রি
+  </div>
+  <div class="nav-tab" onclick="showPage('loan')">
+    <span class="tab-icon">💰</span>লোন/বাকি
+  </div>
+  <div class="nav-tab" onclick="showPage('history')">
+    <span class="tab-icon">📋</span>ইতিহাস
+  </div>
+  <div class="nav-tab" onclick="showPage('settings')">
+    <span class="tab-icon">⚙️</span>সেটিং
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 1: FORM
+═══════════════════════════════════════════ -->
+<div id="page-form" class="page active">
+
+  <div id="queueNotice" class="queue-notice">
+    ⏳ <span id="queueCount">0</span> টি এন্ট্রি অফলাইনে আছে। সংযোগ পেলে সিঙ্ক হবে।
+  </div>
+
+  <div class="card">
+    <div class="card-title">নতুন এন্ট্রি</div>
+
+    <!-- CATEGORY -->
+    <div class="form-group">
+      <label>ক্যাটাগরি <span class="req">*</span></label>
+      <select id="category" onchange="onCategoryChange()">
+        <option value="">-- ক্যাটাগরি বেছে নিন --</option>
+        <option value="Food">🍽️ Food</option>
+        <option value="Gifts">🎁 Gifts</option>
+        <option value="Health/Medical">🏥 Health/Medical</option>
+        <option value="Bike Cost">🏍️ Bike Cost</option>
+        <option value="Transportation">🚌 Transportation</option>
+        <option value="Personal">👤 Personal</option>
+        <option value="Giving Loan">💸 Giving Loan (লোন দিচ্ছি)</option>
+        <option value="Taking Loan">🤝 Taking Loan (লোন নিচ্ছি)</option>
+        <option value="Loan Paid">✅ Loan Paid (লোন পরিশোধ)</option>
+        <option value="Credit Purchase">🛒 Credit Purchase (বাকি কেনাকাটা)</option>
+        <option value="Credit Purchase Loan Paid">✅ Credit Purchase Loan Paid</option>
+        <option value="Net & Electricity Bill">💡 Net & Electricity Bill</option>
+        <option value="Travel">✈️ Travel</option>
+        <option value="Donate">❤️ Donate</option>
+        <option value="Savings">🏦 Savings</option>
+        <option value="Other">📌 Other</option>
+      </select>
+    </div>
+
+    <!-- PHONE (conditional) -->
+    <div class="form-group" id="phoneGroup">
+      <label>ফোন নম্বর <span class="req" id="phoneReq"></span></label>
+      <input type="tel" id="phone" placeholder="01XXXXXXXXX" oninput="onPhoneInput()" autocomplete="tel">
+      <div class="field-error" id="phoneError">এই ক্যাটাগরিতে ফোন নম্বর আবশ্যক</div>
+      <div class="field-hint">নম্বর দিলে নাম অটো-ফিল হবে</div>
+    </div>
+
+    <!-- NAME -->
+    <div class="form-group">
+      <label>নাম</label>
+      <input type="text" id="name" placeholder="নাম লিখুন">
+      <div id="autofillBadge" style="display:none" class="autofill-badge">✓ নেটওয়ার্ক থেকে অটো-ফিল</div>
+    </div>
+
+    <!-- AMOUNTS -->
+    <div class="amount-row">
+      <div class="form-group">
+        <label>নিয়েছি (Take) <span style="color:var(--green)">↓</span></label>
+        <input type="number" id="takeAmount" placeholder="0.00" min="0" step="0.01" inputmode="decimal">
+      </div>
+      <div class="form-group">
+        <label>দিয়েছি (Give) <span style="color:var(--accent)">↑</span></label>
+        <input type="number" id="giveAmount" placeholder="0.00" min="0" step="0.01" inputmode="decimal">
+      </div>
+    </div>
+
+  </div><!-- /card -->
+
+  <!-- SMS OPTION (conditional) -->
+  <div class="sms-option" id="smsOption">
+    <label class="sms-checkbox-row">
+      <input type="checkbox" id="sendSms" onchange="updateSmsPreview()">
+      <div>
+        <div class="sms-label">📩 SMS পাঠাবো</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px">চেক করলে সাবমিটের পর SMS যাবে</div>
+      </div>
+    </label>
+    <div class="sms-preview" id="smsPreview"></div>
+  </div>
+
+  <button class="btn btn-primary" onclick="submitForm()" id="submitBtn">
+    সেভ করুন
+  </button>
+
+</div><!-- /page-form -->
+
+
+<!-- ═══════════════════════════════════════════
+     PAGE 2: LOAN DASHBOARD
+═══════════════════════════════════════════ -->
+<div id="page-loan" class="page">
+  <div class="loan-tabs">
+    <div class="loan-tab" id="tab-give" onclick="showLoanSection('give')">
+      💚 আমি পাবো<br><small>দিয়েছি যাকে</small>
+    </div>
+    <div class="loan-tab" id="tab-take" onclick="showLoanSection('take')">
+      🔴 আমি দেবো<br><small>নিয়েছি যার কাছে</small>
+    </div>
+    <div class="loan-tab" id="tab-credit" onclick="showLoanSection('credit')">
+      🟡 বাকি কিনেছি<br><small>দোকানে বাকি</small>
+    </div>
+  </div>
+
+  <div id="loanContent">
+    <div class="empty-state">
+      <span class="empty-icon">💰</span>
+      উপরের ট্যাব থেকে দেখুন
+    </div>
+  </div>
+</div><!-- /page-loan -->
+
+
+<!-- ═══════════════════════════════════════════
+     PAGE 3: HISTORY
+═══════════════════════════════════════════ -->
+<div id="page-history" class="page">
+  <div class="filter-row" id="historyFilters">
+    <div class="filter-chip active" onclick="filterHistory('all', this)">সব</div>
+    <div class="filter-chip" onclick="filterHistory('Giving Loan', this)">লোন দিয়েছি</div>
+    <div class="filter-chip" onclick="filterHistory('Taking Loan', this)">লোন নিয়েছি</div>
+    <div class="filter-chip" onclick="filterHistory('Credit Purchase', this)">বাকি</div>
+    <div class="filter-chip" onclick="filterHistory('Food', this)">খাবার</div>
+    <div class="filter-chip" onclick="filterHistory('Other', this)">অন্যান্য</div>
+  </div>
+  <div id="historyContent"></div>
+</div><!-- /page-history -->
+
+
+<!-- ═══════════════════════════════════════════
+     PAGE 4: SETTINGS
+═══════════════════════════════════════════ -->
+<div id="page-settings" class="page">
+  <div class="card">
+    <div class="card-title">Google Sheets সংযোগ</div>
+    <div class="setting-item">
+      <div>
+        <div class="setting-label">Apps Script URL</div>
+        <div class="setting-sub">Google Apps Script Web App URL</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <input type="url" id="settingScriptUrl" class="setting-input" style="width:100%" placeholder="https://script.google.com/macros/s/...">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">SMS সেটিং (Twilio)</div>
+    <div class="form-group">
+      <label>Twilio Account SID</label>
+      <input type="text" id="settingTwilioSid" placeholder="ACxxxxxxxxxxxxxx">
+    </div>
+    <div class="form-group">
+      <label>Twilio Auth Token</label>
+      <input type="password" id="settingTwilioToken" placeholder="••••••••">
+    </div>
+    <div class="form-group">
+      <label>Twilio Phone Number</label>
+      <input type="tel" id="settingTwilioFrom" placeholder="+1xxxxxxxxxx">
+    </div>
+    <div class="form-group">
+      <label>আপনার নাম (SMS-এ পাঠানোর জন্য)</label>
+      <input type="text" id="settingMyName" placeholder="আপনার নাম">
+    </div>
+  </div>
+
+  <button class="btn btn-teal" onclick="saveSettings()">সেটিং সেভ করুন</button>
+
+  <div class="card" style="margin-top:14px">
+    <div class="card-title">অফলাইন ডেটা</div>
+    <div class="setting-item">
+      <div>
+        <div class="setting-label">পেন্ডিং সিঙ্ক</div>
+        <div class="setting-sub" id="pendingCount">0 টি এন্ট্রি</div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="manualSync()">সিঙ্ক করুন</button>
+    </div>
+    <div class="setting-item">
+      <div>
+        <div class="setting-label">সব ডেটা মুছুন</div>
+        <div class="setting-sub">সতর্কতা: এটি অপরিবর্তনীয়</div>
+      </div>
+      <button class="btn btn-sm" style="background:var(--accent);color:#fff" onclick="clearAllData()">মুছুন</button>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px">
+    হিসাবনিকাশ v1.0 · PWA · অফলাইন সাপোর্ট
+  </div>
+</div><!-- /page-settings -->
+
+
+<script>
+// ═══════════════════════════════════════
+// CONFIG & STATE
+// ═══════════════════════════════════════
+let DB;
+let isOnline = navigator.onLine;
+let networkContacts = {}; // phone → name cache
+let settings = {};
+let currentHistoryFilter = 'all';
+let activeLoanSection = null;
+
+const LOAN_CATS = ['Giving Loan','Taking Loan','Loan Paid','Credit Purchase','Credit Purchase Loan Paid'];
+const SMS_CATS  = ['Giving Loan','Taking Loan','Loan Paid','Credit Purchase','Credit Purchase Loan Paid'];
+const PHONE_REQ = ['Giving Loan','Taking Loan','Loan Paid','Credit Purchase','Credit Purchase Loan Paid'];
+
+// ═══════════════════════════════════════
+// INDEXEDDB INIT
+// ═══════════════════════════════════════
+function initDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('HisabDB', 2);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('expenses')) {
+        const s = db.createObjectStore('expenses', { keyPath: 'id', autoIncrement: true });
+        s.createIndex('synced', 'synced', { unique: false });
+        s.createIndex('category', 'category', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('network')) {
+        const n = db.createObjectStore('network', { keyPath: 'phone' });
+      }
+    };
+    req.onsuccess = e => { DB = e.target.result; resolve(); };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbStore(storeName, mode) {
+  return DB.transaction(storeName, mode).objectStore(storeName);
+}
+
+function dbGetAll(storeName) {
+  return new Promise((resolve, reject) => {
+    const req = dbStore(storeName, 'readonly').getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbAdd(storeName, data) {
+  return new Promise((resolve, reject) => {
+    const req = dbStore(storeName, 'readwrite').add(data);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbPut(storeName, data) {
+  return new Promise((resolve, reject) => {
+    const req = dbStore(storeName, 'readwrite').put(data);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbDelete(storeName, key) {
+  return new Promise((resolve, reject) => {
+    const req = dbStore(storeName, 'readwrite').delete(key);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// ═══════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════
+function loadSettings() {
+  const s = localStorage.getItem('hn_settings');
+  if (s) settings = JSON.parse(s);
+  document.getElementById('settingScriptUrl').value = settings.scriptUrl || '';
+  document.getElementById('settingTwilioSid').value = settings.twilioSid || '';
+  document.getElementById('settingTwilioToken').value = settings.twilioToken || '';
+  document.getElementById('settingTwilioFrom').value = settings.twilioFrom || '';
+  document.getElementById('settingMyName').value = settings.myName || '';
+}
+function saveSettings() {
+  settings = {
+    scriptUrl: document.getElementById('settingScriptUrl').value.trim(),
+    twilioSid: document.getElementById('settingTwilioSid').value.trim(),
+    twilioToken: document.getElementById('settingTwilioToken').value.trim(),
+    twilioFrom: document.getElementById('settingTwilioFrom').value.trim(),
+    myName: document.getElementById('settingMyName').value.trim(),
+  };
+  localStorage.setItem('hn_settings', JSON.stringify(settings));
+  showToast('✅ সেটিং সেভ হয়েছে', 'success');
+}
+
+// ═══════════════════════════════════════
+// CONNECTIVITY
+// ═══════════════════════════════════════
+function updateOnlineStatus() {
+  isOnline = navigator.onLine;
+  const badge = document.getElementById('syncBadge');
+  badge.textContent = isOnline ? '● অনলাইন' : '● অফলাইন';
+  badge.className = 'sync-badge ' + (isOnline ? 'online' : 'offline');
+  if (isOnline) syncPendingData();
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+
+// ═══════════════════════════════════════
+// CATEGORY CHANGE
+// ═══════════════════════════════════════
+function onCategoryChange() {
+  const cat = document.getElementById('category').value;
+  const isReq = PHONE_REQ.includes(cat);
+  const isSms = SMS_CATS.includes(cat);
+
+  document.getElementById('phoneReq').textContent = isReq ? '*' : '';
+
+  // SMS option
+  const smsEl = document.getElementById('smsOption');
+  if (isSms) smsEl.classList.add('show'); else smsEl.classList.remove('show');
+  document.getElementById('sendSms').checked = false;
+  document.getElementById('smsPreview').classList.remove('show');
+
+  updateSmsPreview();
+}
+
+// ═══════════════════════════════════════
+// PHONE AUTOFILL
+// ═══════════════════════════════════════
+let phoneTimer = null;
+async function onPhoneInput() {
+  const phone = document.getElementById('phone').value.trim();
+  document.getElementById('autofillBadge').style.display = 'none';
+
+  clearTimeout(phoneTimer);
+  if (phone.length < 8) return;
+
+  phoneTimer = setTimeout(async () => {
+    // Check local cache first
+    if (networkContacts[phone]) {
+      document.getElementById('name').value = networkContacts[phone];
+      document.getElementById('autofillBadge').style.display = 'inline-block';
+      return;
+    }
+    // Check IndexedDB
+    try {
+      const store = dbStore('network', 'readonly');
+      const req = store.get(phone);
+      req.onsuccess = () => {
+        if (req.result) {
+          document.getElementById('name').value = req.result.name;
+          networkContacts[phone] = req.result.name;
+          document.getElementById('autofillBadge').style.display = 'inline-block';
+        }
+      };
+    } catch(e) {}
+
+    // If online and scriptUrl set, also check sheets
+    if (isOnline && settings.scriptUrl) {
+      try {
+        const res = await fetch(`${settings.scriptUrl}?action=lookupPhone&phone=${encodeURIComponent(phone)}`);
+        const data = await res.json();
+        if (data.name) {
+          document.getElementById('name').value = data.name;
+          networkContacts[phone] = data.name;
+          document.getElementById('autofillBadge').style.display = 'inline-block';
+          // save locally
+          await dbPut('network', { phone, name: data.name });
+        }
+      } catch(e) {}
+    }
+
+    updateSmsPreview();
+  }, 600);
+}
+
+// ═══════════════════════════════════════
+// SMS PREVIEW
+// ═══════════════════════════════════════
+function updateSmsPreview() {
+  const cat = document.getElementById('category').value;
+  const name = document.getElementById('name').value.trim();
+  const take = parseFloat(document.getElementById('takeAmount').value) || 0;
+  const give = parseFloat(document.getElementById('giveAmount').value) || 0;
+  const myName = settings.myName || 'আপনি';
+  const checked = document.getElementById('sendSms').checked;
+
+  const preview = document.getElementById('smsPreview');
+  if (!checked) { preview.classList.remove('show'); return; }
+
+  let msg = '';
+  if (cat === 'Giving Loan')
+    msg = `${name} ভাই, ${myName} আপনাকে ${give} টাকা লোন দিয়েছেন। অনুগ্রহ করে মনে রাখবেন।`;
+  else if (cat === 'Taking Loan')
+    msg = `${myName} আপনার কাছ থেকে ${take} টাকা লোন নিয়েছেন।`;
+  else if (cat === 'Loan Paid')
+    msg = `${name} ভাই, ${myName} আপনাকে ${give} টাকা পরিশোধ করেছেন।`;
+  else if (cat === 'Credit Purchase')
+    msg = `${name} ভাই, ${myName} আপনার কাছ থেকে ${take} টাকার বাকি কিনেছেন।`;
+  else if (cat === 'Credit Purchase Loan Paid')
+    msg = `${name} ভাই, ${myName} ${give} টাকা বাকি পরিশোধ করেছেন।`;
+
+  if (msg) {
+    preview.textContent = '📩 ' + msg;
+    preview.classList.add('show');
+  }
+}
+
+// Input listeners for SMS preview
+['name','takeAmount','giveAmount'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateSmsPreview);
+});
+
+// ═══════════════════════════════════════
+// FORM SUBMIT
+// ═══════════════════════════════════════
+async function submitForm() {
+  const cat = document.getElementById('category').value;
+  const phone = document.getElementById('phone').value.trim();
+  const name = document.getElementById('name').value.trim();
+  const take = parseFloat(document.getElementById('takeAmount').value) || 0;
+  const give = parseFloat(document.getElementById('giveAmount').value) || 0;
+  const sendSms = document.getElementById('sendSms').checked;
+
+  // Validation
+  if (!cat) { showToast('❌ ক্যাটাগরি বেছে নিন', 'error'); return; }
+  if (PHONE_REQ.includes(cat) && !phone) {
+    document.getElementById('phoneError').classList.add('show');
+    document.getElementById('phone').classList.add('error');
+    showToast('❌ ফোন নম্বর দিন', 'error');
+    return;
+  }
+  if (take === 0 && give === 0) { showToast('❌ টাকার পরিমাণ দিন', 'error'); return; }
+
+  document.getElementById('phoneError').classList.remove('show');
+  document.getElementById('phone').classList.remove('error');
+
+  const entry = {
+    dateTime: new Date().toLocaleString('bn-BD', { timeZone: 'Asia/Dhaka' }),
+    dateTimeISO: new Date().toISOString(),
+    category: cat,
+    name: name,
+    phone: phone,
+    takeAmount: take,
+    giveAmount: give,
+    synced: false,
+    smsQueued: sendSms,
+  };
+
+  const btn = document.getElementById('submitBtn');
+  btn.innerHTML = '<span class="spinner"></span> সেভ হচ্ছে...';
+  btn.disabled = true;
+
+  try {
+    // Save locally first
+    const id = await dbAdd('expenses', entry);
+    entry.id = id;
+
+    // Save/update network contact if phone+name given
+    if (phone && name) {
+      await dbPut('network', { phone, name });
+      networkContacts[phone] = name;
+    }
+
+    // Try online sync
+    if (isOnline && settings.scriptUrl) {
+      await syncEntry(entry);
+      // Send SMS if checked
+      if (sendSms && phone) await sendSMSForEntry(entry);
+    } else if (sendSms && phone) {
+      // Queue SMS
+      entry.smsQueued = true;
+      await dbPut('expenses', entry);
+    }
+
+    resetForm();
+    updateQueueBadge();
+    showToast('✅ এন্ট্রি সেভ হয়েছে', 'success');
+  } catch(e) {
+    showToast('❌ সমস্যা হয়েছে: ' + e.message, 'error');
+  }
+
+  btn.innerHTML = 'সেভ করুন';
+  btn.disabled = false;
+}
+
+function resetForm() {
+  ['category','phone','name','takeAmount','giveAmount'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('sendSms').checked = false;
+  document.getElementById('smsOption').classList.remove('show');
+  document.getElementById('smsPreview').classList.remove('show');
+  document.getElementById('autofillBadge').style.display = 'none';
+  document.getElementById('phoneReq').textContent = '';
+}
+
+// ═══════════════════════════════════════
+// SYNC TO GOOGLE SHEETS
+// ═══════════════════════════════════════
+async function syncEntry(entry) {
+  if (!settings.scriptUrl) return;
+  try {
+    const res = await fetch(settings.scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'addExpense', data: entry })
+    });
+    const result = await res.json();
+    if (result.success) {
+      entry.synced = true;
+      await dbPut('expenses', entry);
+    }
+    // Save contact to sheets
+    if (entry.phone && entry.name) {
+      fetch(settings.scriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'saveContact', phone: entry.phone, name: entry.name })
+      }).catch(() => {});
+    }
+  } catch(e) {
+    console.warn('Sync failed:', e);
+  }
+}
+
+async function syncPendingData() {
+  if (!settings.scriptUrl) return;
+  const all = await dbGetAll('expenses');
+  const pending = all.filter(e => !e.synced);
+  for (const entry of pending) {
+    await syncEntry(entry);
+    if (entry.smsQueued && entry.phone && entry.synced) {
+      await sendSMSForEntry(entry);
+      entry.smsQueued = false;
+      await dbPut('expenses', entry);
+    }
+  }
+  updateQueueBadge();
+}
+
+async function manualSync() {
+  if (!isOnline) { showToast('❌ ইন্টারনেট নেই', 'error'); return; }
+  showToast('🔄 সিঙ্ক হচ্ছে...', 'info');
+  await syncPendingData();
+  showToast('✅ সিঙ্ক সম্পন্ন', 'success');
+  updateQueueBadge();
+}
+
+async function updateQueueBadge() {
+  const all = await dbGetAll('expenses');
+  const count = all.filter(e => !e.synced).length;
+  const notice = document.getElementById('queueNotice');
+  const countEl = document.getElementById('queueCount');
+  const pendingEl = document.getElementById('pendingCount');
+  countEl.textContent = count;
+  if (pendingEl) pendingEl.textContent = count + ' টি এন্ট্রি';
+  if (count > 0) notice.classList.add('show'); else notice.classList.remove('show');
+}
+
+// ═══════════════════════════════════════
+// SMS (via Apps Script proxy to Twilio)
+// ═══════════════════════════════════════
+async function sendSMSForEntry(entry) {
+  if (!settings.scriptUrl || !entry.phone) return;
+  const myName = settings.myName || 'আপনি';
+  let msg = '';
+  const cat = entry.category;
+  const name = entry.name;
+  const take = entry.takeAmount;
+  const give = entry.giveAmount;
+
+  if (cat === 'Giving Loan')
+    msg = `${name}, ${myName} আপনাকে ${give} টাকা লোন দিয়েছেন।`;
+  else if (cat === 'Taking Loan')
+    msg = `প্রিয় ${name}, ${myName} আপনার কাছ থেকে ${take} টাকা লোন নিয়েছেন।`;
+  else if (cat === 'Loan Paid')
+    msg = `${name}, ${myName} ${give} টাকা পরিশোধ করেছেন। বাকি পরীক্ষা করুন।`;
+  else if (cat === 'Credit Purchase')
+    msg = `${name}, ${myName} ${take} টাকার বাকি কিনেছেন।`;
+  else if (cat === 'Credit Purchase Loan Paid')
+    msg = `${name}, ${myName} ${give} টাকা বাকি পরিশোধ করেছেন।`;
+
+  if (!msg) return;
+  try {
+    await fetch(settings.scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'sendSMS',
+        to: entry.phone,
+        body: msg,
+        twilio: { sid: settings.twilioSid, token: settings.twilioToken, from: settings.twilioFrom }
+      })
+    });
+  } catch(e) { console.warn('SMS send failed', e); }
+}
+
+// ═══════════════════════════════════════
+// LOAN DASHBOARD
+// ═══════════════════════════════════════
+async function showLoanSection(type) {
+  activeLoanSection = type;
+  // Update tabs
+  ['give','take','credit'].forEach(t => {
+    const el = document.getElementById('tab-' + t);
+    el.className = 'loan-tab';
+  });
+  document.getElementById('tab-' + type).className = 'loan-tab active-' + type;
+
+  const all = await dbGetAll('expenses');
+  const content = document.getElementById('loanContent');
+
+  if (type === 'give') {
+    // Giving Loan → আমি পাবো (দিয়েছি কিন্তু পাইনি)
+    const map = buildLoanMap(all, 'Giving Loan', 'Loan Paid', 'giveAmount', 'takeAmount');
+    content.innerHTML = renderLoanMap(map, 'give', '💚 আমি পাবো (যাদের লোন দিয়েছি)');
+  } else if (type === 'take') {
+    // Taking Loan → আমি দেবো
+    const map = buildLoanMap(all, 'Taking Loan', 'Loan Paid', 'takeAmount', 'giveAmount');
+    content.innerHTML = renderLoanMap(map, 'take', '🔴 আমি দেবো (যাদের কাছে লোন আছে)');
+  } else {
+    // Credit Purchase → বাকি
+    const map = buildLoanMap(all, 'Credit Purchase', 'Credit Purchase Loan Paid', 'takeAmount', 'giveAmount');
+    content.innerHTML = renderLoanMap(map, 'credit', '🟡 বাকি কেনাকাটা (দোকানে বাকি)');
+  }
+}
+
+function buildLoanMap(all, loanCat, paidCat, loanAmtKey, paidAmtKey) {
+  const map = {};
+  for (const e of all) {
+    const key = e.phone || e.name || 'অজানা';
+    if (!map[key]) map[key] = { name: e.name, phone: e.phone, total: 0, paid: 0 };
+    if (e.category === loanCat) map[key].total += e[loanAmtKey] || 0;
+    if (e.category === paidCat && (e.phone === key || e.name === key)) map[key].paid += e[paidAmtKey] || 0;
+  }
+  return map;
+}
+
+function renderLoanMap(map, type, title) {
+  const entries = Object.values(map).filter(v => v.total > 0);
+  if (entries.length === 0) return `<div class="empty-state"><span class="empty-icon">✨</span>কোনো রেকর্ড নেই</div>`;
+
+  let html = `<div class="loan-section-title">${title}</div>`;
+  for (const v of entries) {
+    const remaining = v.total - v.paid;
+    if (remaining <= 0) continue;
+    html += `
+      <div class="loan-item">
+        <div>
+          <div class="loan-item-name">${v.name || 'অজানা'}</div>
+          <div class="loan-item-phone">${v.phone || ''}</div>
+        </div>
+        <div class="loan-amounts">
+          <div class="loan-remaining ${type}">৳${remaining.toLocaleString('bn-BD')}</div>
+          <div class="loan-meta">মোট: ৳${v.total.toLocaleString('bn-BD')} | পরিশোধ: ৳${v.paid.toLocaleString('bn-BD')}</div>
+        </div>
+      </div>`;
+  }
+  if (!html.includes('loan-item')) html += `<div class="empty-state"><span class="empty-icon">✅</span>সব পরিশোধ হয়েছে!</div>`;
+  return html;
+}
+
+// ═══════════════════════════════════════
+// HISTORY
+// ═══════════════════════════════════════
+async function loadHistory(filter = 'all') {
+  const all = await dbGetAll('expenses');
+  const filtered = filter === 'all' ? all : all.filter(e => e.category === filter);
+  const sorted = filtered.sort((a, b) => new Date(b.dateTimeISO) - new Date(a.dateTimeISO));
+
+  const content = document.getElementById('historyContent');
+  if (sorted.length === 0) {
+    content.innerHTML = '<div class="empty-state"><span class="empty-icon">📭</span>কোনো এন্ট্রি নেই</div>';
+    return;
+  }
+
+  content.innerHTML = sorted.slice(0, 100).map(e => {
+    const hasAmount = e.takeAmount > 0 || e.giveAmount > 0;
+    const mainAmt = e.takeAmount > 0 ? e.takeAmount : e.giveAmount;
+    const type = e.takeAmount > 0 ? 'take' : 'give';
+    const pending = !e.synced ? '<span class="history-pending">⏳ সিঙ্ক বাকি</span>' : '';
+    return `
+      <div class="history-item ${type}">
+        <div class="history-top">
+          <span class="history-cat">${e.category}</span>
+          <span class="history-amount ${type}">৳${(mainAmt||0).toLocaleString('bn-BD')}</span>
+        </div>
+        <div class="history-name">${e.name || '—'} ${e.phone ? '· ' + e.phone : ''}</div>
+        <div class="history-date">${e.dateTime}</div>
+        ${pending}
+      </div>`;
+  }).join('');
+}
+
+function filterHistory(cat, el) {
+  currentHistoryFilter = cat;
+  document.querySelectorAll('#historyFilters .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  loadHistory(cat);
+}
+
+// ═══════════════════════════════════════
+// PAGE NAVIGATION
+// ═══════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const tabs = ['form','loan','history','settings'];
+  const idx = tabs.indexOf(name);
+  document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+
+  if (name === 'history') loadHistory(currentHistoryFilter);
+  if (name === 'loan') {
+    if (activeLoanSection) showLoanSection(activeLoanSection);
+    else showLoanSection('give');
+  }
+  if (name === 'settings') updateQueueBadge();
+}
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+let toastTimer;
+function showToast(msg, type = 'info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════
+// CLEAR DATA
+// ═══════════════════════════════════════
+async function clearAllData() {
+  if (!confirm('সব ডেটা মুছে ফেলবেন? এটি অপরিবর্তনীয়।')) return;
+  const all = await dbGetAll('expenses');
+  for (const e of all) await dbDelete('expenses', e.id);
+  const net = await dbGetAll('network');
+  for (const n of net) await dbDelete('network', n.phone);
+  networkContacts = {};
+  updateQueueBadge();
+  showToast('✅ সব ডেটা মুছা হয়েছে', 'success');
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+async function init() {
+  await initDB();
+  loadSettings();
+  updateOnlineStatus();
+  updateQueueBadge();
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+}
+init();
+</script>
+
+</body>
+</html>

@@ -321,11 +321,11 @@ select option{background:#1a1a2e}
     </div>
   </div>
   <div class="card">
-    <div class="card-title">SMS (Twilio)</div>
-    <div class="form-group"><label>Account SID</label><input type="text" id="settingTwilioSid" placeholder="ACxxxxxx"></div>
-    <div class="form-group"><label>Auth Token</label><input type="password" id="settingTwilioToken" placeholder="••••••••"></div>
-    <div class="form-group"><label>Twilio Phone</label><input type="tel" id="settingTwilioFrom" placeholder="+1xxxxxxxxxx"></div>
-    <div class="form-group"><label>আপনার নাম</label><input type="text" id="settingMyName" placeholder="আপনার নাম"></div>
+    <div class="card">
+    <div class="card-title">SMS সেটিং</div>
+    <div style="background:rgba(0,180,216,.08);border:1px solid rgba(0,180,216,.3);border-radius:8px;padding:12px;margin-bottom:14px;font-size:13px;color:var(--teal);line-height:1.6">📱 SMS চেক করে সেভ করলে আপনার ফোনের Messages App খুলবে। নম্বর ও মেসেজ লেখা থাকবে — শুধু <strong>Send</strong> চাপলেই SMS যাবে।</div>
+    <div class="form-group"><label>আপনার নাম (SMS-এ যাবে)</label><input type="text" id="settingMyName" placeholder="যেমন: Shohel"></div>
+  </div>
   </div>
   <button class="btn btn-teal" onclick="saveSettings()">সেটিং সেভ করুন</button>
   <div class="card" style="margin-top:14px">
@@ -387,7 +387,7 @@ function dbDelete(name, key) { return new Promise((r,j) => { const q=dbStore(nam
 function loadSettings() {
   const s = localStorage.getItem('hn_settings');
   if (s) settings = JSON.parse(s);
-  ['ScriptUrl','TwilioSid','TwilioToken','TwilioFrom','MyName'].forEach(k => {
+  ["ScriptUrl","MyName"].forEach(k => {
     const el = document.getElementById('setting'+k);
     if (el) el.value = settings[k[0].toLowerCase()+k.slice(1)] || '';
   });
@@ -395,9 +395,6 @@ function loadSettings() {
 function saveSettings() {
   settings = {
     scriptUrl: document.getElementById('settingScriptUrl').value.trim(),
-    twilioSid: document.getElementById('settingTwilioSid').value.trim(),
-    twilioToken: document.getElementById('settingTwilioToken').value.trim(),
-    twilioFrom: document.getElementById('settingTwilioFrom').value.trim(),
     myName: document.getElementById('settingMyName').value.trim(),
   };
   localStorage.setItem('hn_settings', JSON.stringify(settings));
@@ -624,24 +621,35 @@ async function updateQueueBadge() {
 // ═══════════════════════════════════════
 // SMS
 // ═══════════════════════════════════════
-async function sendSMSForEntry(entry) {
-  if (!settings.scriptUrl || !entry.phone) return;
+function sendSMSForEntry(entry) {
   const myName = settings.myName || 'আমি';
-  const name = entry.name, take = entry.takeAmount, give = entry.giveAmount, cat = entry.category;
+  const name = entry.name || '';
+  const take = entry.takeAmount || 0;
+  const give = entry.giveAmount || 0;
+  const cat = entry.category;
+  const phone = entry.phone;
+  if (!phone) return;
+
   let msg = '';
-  if (cat==='Giving Loan') msg=`${name}, ${myName} আপনাকে ${give} টাকা লোন দিয়েছেন।`;
-  else if (cat==='Taking Loan') msg=`প্রিয় ${name}, ${myName} আপনার কাছ থেকে ${take} টাকা লোন নিয়েছেন।`;
-  else if (cat==='Loan Paid') msg=`${name}, ${myName} ${give} টাকা পরিশোধ করেছেন।`;
-  else if (cat==='Credit Purchase') msg=`${name}, ${myName} ${take} টাকার বাকি কিনেছেন।`;
-  else if (cat==='Credit Purchase Loan Paid') msg=`${name}, ${myName} ${give} টাকা বাকি পরিশোধ করেছেন।`;
-  else if (cat==='Loan repaid') msg=`${myName}, ${name} আপনার ${take} টাকা ফেরত দিয়েছেন।`;
+  if (cat==='Giving Loan')
+    msg = `${name}, ${myName} আপনাকে ${give} টাকা লোন দিয়েছেন।`;
+  else if (cat==='Taking Loan')
+    msg = `${name}, ${myName} আপনার কাছ থেকে ${take} টাকা লোন নিয়েছেন।`;
+  else if (cat==='Loan Paid')
+    msg = `${name}, ${myName} আপনাকে ${give} টাকা পরিশোধ করেছেন।`;
+  else if (cat==='Credit Purchase')
+    msg = `${name}, ${myName} আপনার কাছ থেকে ${take} টাকার বাকি কিনেছেন।`;
+  else if (cat==='Credit Purchase Loan Paid')
+    msg = `${name}, ${myName} ${give} টাকা বাকি পরিশোধ করেছেন।`;
+  else if (cat==='Loan repaid')
+    msg = `${name}, আপনি ${myName} কে ${take} টাকা ফেরত দিয়েছেন।`;
+
   if (!msg) return;
-  try {
-    await fetch(settings.scriptUrl, {method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({action:'sendSMS', to:entry.phone, body:msg,
-        twilio:{sid:settings.twilioSid, token:settings.twilioToken, from:settings.twilioFrom}})
-    });
-  } catch(e){ console.warn('SMS fail',e); }
+
+  // ফোনের Messages App খুলবে — নম্বর ও মেসেজ লেখা থাকবে
+  // শুধু Send চাপলেই SMS যাবে
+  const smsUrl = `sms:${phone}?body=${encodeURIComponent(msg)}`;
+  window.location.href = smsUrl;
 }
 
 // ═══════════════════════════════════════

@@ -123,11 +123,11 @@ select option{background:#1a1a2e}
 </div>
 
 <div class="nav-tabs">
-  <div class="nav-tab active" onclick="showPage('form')"><span class="ti">✏️</span>এন্ট্রি</div>
-  <div class="nav-tab" onclick="showPage('summary')"><span class="ti">📊</span>সারসংক্ষেপ</div>
-  <div class="nav-tab" onclick="showPage('loan')"><span class="ti">💰</span>লোন/বাকি</div>
-  <div class="nav-tab" onclick="showPage('history')"><span class="ti">📋</span>ইতিহাস</div>
-  <div class="nav-tab" onclick="showPage('settings')"><span class="ti">⚙️</span>সেটিং</div>
+  <div class="nav-tab active"><span class="ti">✏️</span>এন্ট্রি</div>
+  <div class="nav-tab"><span class="ti">📊</span>সারসংক্ষেপ</div>
+  <div class="nav-tab"><span class="ti">💰</span>লোন/বাকি</div>
+  <div class="nav-tab"><span class="ti">📋</span>ইতিহাস</div>
+  <div class="nav-tab"><span class="ti">⚙️</span>সেটিং</div>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -212,15 +212,15 @@ select option{background:#1a1a2e}
     <div class="sms-preview" id="smsPreview"></div>
   </div>
 
-  <button class="btn btn-primary" onclick="submitForm()" id="submitBtn">সেভ করুন</button>
+  <button class="btn btn-primary" id="submitBtn">সেভ করুন</button>
 </div>
 
 <!-- SUMMARY PAGE -->
 <div id="page-summary" class="page">
   <div class="month-picker">
-    <button class="month-nav" onclick="changeMonth(-1)">◀</button>
-    <select id="monthPicker" onchange="loadSummary()"></select>
-    <button class="month-nav" onclick="changeMonth(1)">▶</button>
+    <button class="month-nav" id="btnPrev">◀</button>
+    <select id="monthPicker" ></select>
+    <button class="month-nav" id="btnNext">▶</button>
   </div>
   <div class="summary-grid">
     <div class="sum-card"><div class="sum-label">💵 মোট আয়</div><div class="sum-amount income" id="sumIncome">৳০</div></div>
@@ -239,9 +239,9 @@ select option{background:#1a1a2e}
 <!-- LOAN PAGE -->
 <div id="page-loan" class="page">
   <div class="loan-tabs">
-    <div class="loan-tab" id="tab-give" onclick="showLoanSection('give')">💚 আমি পাবো</div>
-    <div class="loan-tab" id="tab-take" onclick="showLoanSection('take')">🔴 আমি দেবো</div>
-    <div class="loan-tab" id="tab-credit" onclick="showLoanSection('credit')">🟡 বাকি</div>
+    <div class="loan-tab" id="tab-give" data-loan="give">💚 আমি পাবো</div>
+    <div class="loan-tab" id="tab-take" data-loan="take">🔴 আমি দেবো</div>
+    <div class="loan-tab" id="tab-credit" data-loan="credit">🟡 বাকি</div>
   </div>
   <div id="loanContent"><div class="empty-state"><span class="ei">💰</span>উপরের ট্যাব থেকে দেখুন</div></div>
 </div>
@@ -249,13 +249,13 @@ select option{background:#1a1a2e}
 <!-- HISTORY PAGE -->
 <div id="page-history" class="page">
   <div class="filter-row" id="historyFilters">
-    <div class="filter-chip active" onclick="filterHistory('all',this)">সব</div>
-    <div class="filter-chip" onclick="filterHistory('Paycheck',this)">Paycheck</div>
-    <div class="filter-chip" onclick="filterHistory('Giving Loan',this)">লোন দিয়েছি</div>
-    <div class="filter-chip" onclick="filterHistory('Taking Loan',this)">লোন নিয়েছি</div>
-    <div class="filter-chip" onclick="filterHistory('Loan repaid',this)">লোন ফেরত</div>
-    <div class="filter-chip" onclick="filterHistory('Credit Purchase',this)">বাকি</div>
-    <div class="filter-chip" onclick="filterHistory('Food',this)">খাবার</div>
+    <div class="filter-chip active" data-cat="all">সব</div>
+    <div class="filter-chip" data-cat="Paycheck">Paycheck</div>
+    <div class="filter-chip" data-cat="Giving Loan">লোন দিয়েছি</div>
+    <div class="filter-chip" data-cat="Taking Loan">লোন নিয়েছি</div>
+    <div class="filter-chip" data-cat="Loan repaid">লোন ফেরত</div>
+    <div class="filter-chip" data-cat="Credit Purchase">বাকি</div>
+    <div class="filter-chip" data-cat="Food">খাবার</div>
   </div>
   <div id="historyContent"></div>
 </div>
@@ -265,7 +265,7 @@ select option{background:#1a1a2e}
   <div class="card">
     <div class="card-title">আপনার তথ্য</div>
     <div class="form-group"><label>আপনার নাম (SMS-এ যাবে)</label><input type="text" id="settingMyName" placeholder="যেমন: Shohel"></div>
-    <button class="btn btn-teal" onclick="saveSettings()">সেটিং সেভ করুন</button>
+    <button class="btn btn-teal" id="saveSettingsBtn">সেটিং সেভ করুন</button>
   </div>
 
   <div class="card">
@@ -288,11 +288,11 @@ select option{background:#1a1a2e}
     <div class="card-title">অফলাইন ডেটা</div>
     <div class="setting-item">
       <div><div class="setting-label">পেন্ডিং সিঙ্ক</div><div class="setting-sub" id="pendingCount">০ টি</div></div>
-      <button class="btn btn-outline btn-sm" onclick="syncOfflineData()">সিঙ্ক করুন</button>
+      <button class="btn btn-outline btn-sm" id="syncBtn">সিঙ্ক করুন</button>
     </div>
     <div class="setting-item">
       <div><div class="setting-label">সব লোকাল ডেটা মুছুন</div><div class="setting-sub">Firebase এ থাকবে</div></div>
-      <button class="btn btn-sm" style="background:var(--accent);color:#fff" onclick="clearLocalData()">মুছুন</button>
+      <button class="btn btn-sm" id="clearBtn" style="background:var(--accent);color:#fff">মুছুন</button>
     </div>
   </div>
   <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px">হিসাবনিকাশ v3.0 · Firebase · PWA</div>
@@ -735,6 +735,7 @@ window.showToast = function(msg, type='info') {
 function showToast(msg,type){window.showToast(msg,type);}
 
 // ═══════════════════════════════════════
+// ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
 loadSettings();
@@ -742,6 +743,42 @@ buildMonthOptions();
 await loadExpenses();
 await loadNetworkContacts();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+// Event listeners (module scope — inline onclick doesn't work with type=module)
+document.getElementById('monthPicker').addEventListener('change', window.loadSummary);
+document.getElementById('btnPrev').addEventListener('click', () => window.changeMonth(-1));
+document.getElementById('btnNext').addEventListener('click', () => window.changeMonth(1));
+
+// Nav tabs
+const pages = ['form','summary','loan','history','settings'];
+document.querySelectorAll('.nav-tab').forEach((tab, i) => {
+  tab.addEventListener('click', () => window.showPage(pages[i]));
+});
+
+// Loan tabs
+document.querySelectorAll('.loan-tab').forEach(tab => {
+  tab.addEventListener('click', () => window.showLoanSection(tab.dataset.loan));
+});
+
+// History filter chips
+document.querySelectorAll('#historyFilters .filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => window.filterHistory(chip.dataset.cat, chip));
+});
+
+// Form
+document.getElementById('category').addEventListener('change', window.onCategoryChange);
+document.getElementById('phone').addEventListener('input', window.onPhoneInput);
+document.getElementById('takeAmount').addEventListener('input', window.updateSmsPreview);
+document.getElementById('giveAmount').addEventListener('input', window.updateSmsPreview);
+document.getElementById('sendSms').addEventListener('change', window.updateSmsPreview);
+document.getElementById('name').addEventListener('input', window.updateSmsPreview);
+document.getElementById('submitBtn').addEventListener('click', window.submitForm);
+
+// Settings buttons
+document.getElementById('saveSettingsBtn').addEventListener('click', window.saveSettings);
+document.getElementById('syncBtn').addEventListener('click', window.syncOfflineData);
+document.getElementById('clearBtn').addEventListener('click', window.clearLocalData);
+
 showToast('✅ Firebase সংযুক্ত!', 'success');
 
 </script>

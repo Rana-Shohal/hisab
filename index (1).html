@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1a1a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HisabNikash">
+<link rel="manifest" href="manifest.json">
+<title>হিসাব নিকাশ</title>
+<style>
+:root{--bg:#0f0f1a;--surface:#1a1a2e;--card:#16213e;--accent:#e94560;--teal:#00b4d8;--green:#06d6a0;--yellow:#ffd166;--purple:#9b5de5;--text:#eaeaea;--text-muted:#8892a4;--border:#2a2a4a;--input-bg:#0d0d1f;--radius:14px;--radius-sm:8px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;font-size:15px}
+.topbar{background:var(--surface);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.topbar-title{font-size:20px;font-weight:700;letter-spacing:-0.5px}
+.topbar-title span{color:var(--accent)}
+.sync-badge{font-size:11px;padding:4px 10px;border-radius:20px;font-weight:600}
+.sync-badge.online{background:rgba(6,214,160,.15);color:var(--green)}
+.sync-badge.offline{background:rgba(233,69,96,.15);color:var(--accent)}
+.nav-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{flex:1;min-width:72px;padding:11px 6px;text-align:center;font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.nav-tab .ti{font-size:16px;display:block;margin-bottom:1px}
+.page{display:none;padding:16px}
+.page.active{display:block}
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:14px;border:1px solid var(--border)}
+.card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:14px}
+.form-group{margin-bottom:13px}
+label{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:5px}
+label .req{color:var(--accent)}
+input,select,textarea{width:100%;background:var(--input-bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:11px 13px;color:var(--text);font-size:15px;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--teal)}
+input.error{border-color:var(--accent)}
+textarea{resize:none;min-height:70px;font-family:inherit}
+.field-error{color:var(--accent);font-size:12px;margin-top:4px;display:none}
+.field-error.show{display:block}
+.autofill-badge{font-size:11px;background:rgba(0,180,216,.15);color:var(--teal);padding:3px 8px;border-radius:10px;display:inline-block;margin-top:4px}
+.amount-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.sms-option{background:rgba(6,214,160,.06);border:1.5px solid rgba(6,214,160,.3);border-radius:var(--radius-sm);padding:13px;margin-bottom:13px;display:none}
+.sms-option.show{display:block}
+.sms-checkbox-row{display:flex;align-items:center;gap:10px;cursor:pointer}
+.sms-checkbox-row input[type=checkbox]{width:20px;height:20px;accent-color:var(--green)}
+.sms-label{font-size:14px;font-weight:600}
+.sms-preview{margin-top:10px;background:var(--input-bg);border-radius:var(--radius-sm);padding:10px;font-size:13px;color:var(--text-muted);display:none;line-height:1.6}
+.sms-preview.show{display:block}
+.btn{width:100%;padding:14px;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#c41e3a);color:#fff}
+.btn-primary:active{transform:scale(.98)}
+.btn-teal{background:linear-gradient(135deg,var(--teal),#0077b6);color:#fff}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+.btn-sm{width:auto;padding:8px 14px;font-size:13px}
+.queue-notice{background:rgba(255,209,102,.12);border:1px solid rgba(255,209,102,.3);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:var(--yellow);margin-bottom:14px;display:none;align-items:center;gap:8px}
+.queue-notice.show{display:flex}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.sum-card{background:var(--card);border-radius:var(--radius-sm);padding:14px;border:1px solid var(--border)}
+.sum-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:6px}
+.sum-amount{font-size:20px;font-weight:800}
+.sum-amount.income{color:var(--green)}
+.sum-amount.expense{color:var(--accent)}
+.sum-amount.balance{color:var(--teal)}
+.sum-amount.paycheck{color:var(--purple)}
+.month-picker{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.month-picker select{flex:1}
+.month-nav{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 14px;color:var(--text);font-size:18px;cursor:pointer}
+.loan-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.loan-tab{flex:1;min-width:90px;padding:11px 6px;border-radius:var(--radius-sm);text-align:center;cursor:pointer;border:1.5px solid var(--border);font-size:12px;font-weight:600;color:var(--text-muted)}
+.loan-tab.ag{border-color:var(--green);color:var(--green);background:rgba(6,214,160,.1)}
+.loan-tab.at{border-color:var(--accent);color:var(--accent);background:rgba(233,69,96,.1)}
+.loan-tab.ac{border-color:var(--yellow);color:var(--yellow);background:rgba(255,209,102,.1)}
+.loan-item{background:var(--card);border-radius:var(--radius-sm);padding:13px;margin-bottom:9px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.loan-item-name{font-weight:700;font-size:15px}
+.loan-item-phone{font-size:12px;color:var(--text-muted);margin-top:2px}
+.loan-amounts{text-align:right}
+.loan-remaining{font-size:18px;font-weight:800}
+.loan-remaining.give{color:var(--green)}
+.loan-remaining.take{color:var(--accent)}
+.loan-remaining.credit{color:var(--yellow)}
+.loan-meta{font-size:11px;color:var(--text-muted);margin-top:2px}
+.loan-section-title{font-size:15px;font-weight:700;margin:16px 0 10px}
+.empty-state{text-align:center;padding:36px 20px;color:var(--text-muted)}
+.empty-state .ei{font-size:44px;display:block;margin-bottom:8px}
+.history-item{background:var(--card);border-radius:var(--radius-sm);padding:12px 13px;margin-bottom:8px;border:1px solid var(--border);border-left:4px solid var(--border)}
+.history-item.take{border-left-color:var(--green)}
+.history-item.give{border-left-color:var(--accent)}
+.history-item.paycheck{border-left-color:var(--purple)}
+.history-top{display:flex;justify-content:space-between;align-items:flex-start}
+.history-cat{font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase}
+.history-amount{font-weight:800;font-size:16px}
+.history-amount.take{color:var(--green)}
+.history-amount.give{color:var(--accent)}
+.history-amount.paycheck{color:var(--purple)}
+.history-name{font-size:13px;margin-top:3px}
+.history-reason{font-size:12px;color:var(--text-muted);margin-top:2px;font-style:italic}
+.history-date{font-size:11px;color:var(--text-muted);margin-top:3px}
+.filter-row{display:flex;gap:7px;margin-bottom:13px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-chip{flex-shrink:0;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);color:var(--text-muted);cursor:pointer;background:transparent}
+.filter-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);border:1px solid var(--border);padding:11px 20px;border-radius:25px;font-size:14px;font-weight:600;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:var(--green);color:var(--green)}
+.toast.error{border-color:var(--accent);color:var(--accent)}
+.toast.info{border-color:var(--teal);color:var(--teal)}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:7px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.setting-item{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--border)}
+.setting-label{font-size:14px}
+.setting-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+select option{background:#1a1a2e}
+.fb-status{font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:14px;display:none}
+.fb-status.ok{background:rgba(6,214,160,.1);color:var(--green);border:1px solid rgba(6,214,160,.3);display:block}
+.fb-status.err{background:rgba(233,69,96,.1);color:var(--accent);border:1px solid rgba(233,69,96,.3);display:block}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">হিসাব<span>নিকাশ</span></div>
+  <div id="syncBadge" class="sync-badge offline">● লোড হচ্ছে...</div>
+</div>
+
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="showPage('form')"><span class="ti">✏️</span>এন্ট্রি</div>
+  <div class="nav-tab" onclick="showPage('summary')"><span class="ti">📊</span>সারসংক্ষেপ</div>
+  <div class="nav-tab" onclick="showPage('loan')"><span class="ti">💰</span>লোন/বাকি</div>
+  <div class="nav-tab" onclick="showPage('history')"><span class="ti">📋</span>ইতিহাস</div>
+  <div class="nav-tab" onclick="showPage('settings')"><span class="ti">⚙️</span>সেটিং</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- FORM PAGE -->
+<div id="page-form" class="page active">
+  <div id="queueNotice" class="queue-notice">⏳ <span id="queueCount">0</span> টি এন্ট্রি অফলাইনে আছে — সংযোগ পেলে সিঙ্ক হবে</div>
+  <div id="fbStatus" class="fb-status"></div>
+
+  <div class="card">
+    <div class="card-title">নতুন এন্ট্রি</div>
+
+    <div class="form-group">
+      <label>ক্যাটাগরি <span class="req">*</span></label>
+      <select id="category" onchange="onCategoryChange()">
+        <option value="">-- বেছে নিন --</option>
+        <optgroup label="💵 আয়">
+          <option value="Paycheck">💵 Paycheck (বেতন/আয়)</option>
+          <option value="Loan repaid">✅ Loan Repaid (লোন ফেরত পেয়েছি)</option>
+        </optgroup>
+        <optgroup label="💸 খরচ">
+          <option value="Food">🍽️ Food</option>
+          <option value="Gifts">🎁 Gifts</option>
+          <option value="Health/Medical">🏥 Health/Medical</option>
+          <option value="Bike Cost">🏍️ Bike Cost</option>
+          <option value="Transportation">🚌 Transportation</option>
+          <option value="Personal">👤 Personal</option>
+          <option value="Net & Electricity Bill">💡 Net & Electricity Bill</option>
+          <option value="Travel">✈️ Travel</option>
+          <option value="Donate">❤️ Donate</option>
+          <option value="Savings">🏦 Savings</option>
+          <option value="Other">📌 Other</option>
+        </optgroup>
+        <optgroup label="🤝 লোন/বাকি">
+          <option value="Giving Loan">💸 Giving Loan (লোন দিচ্ছি)</option>
+          <option value="Taking Loan">🤝 Taking Loan (লোন নিচ্ছি)</option>
+          <option value="Loan Paid">✅ Loan Paid (আমার লোন পরিশোধ)</option>
+          <option value="Credit Purchase">🛒 Credit Purchase (বাকি কেনাকাটা)</option>
+          <option value="Credit Purchase Loan Paid">✅ Credit Purchase Paid</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>ফোন নম্বর <span class="req" id="phoneReq"></span></label>
+      <input type="tel" id="phone" placeholder="01XXXXXXXXX" oninput="onPhoneInput()" autocomplete="tel">
+      <div class="field-error" id="phoneError">এই ক্যাটাগরিতে ফোন নম্বর আবশ্যক</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">নম্বর দিলে নাম অটো-ফিল হবে</div>
+    </div>
+
+    <div class="form-group">
+      <label>নাম</label>
+      <input type="text" id="name" placeholder="নাম লিখুন">
+      <div id="autofillBadge" style="display:none" class="autofill-badge">✓ Firebase থেকে অটো-ফিল</div>
+    </div>
+
+    <div class="amount-row">
+      <div class="form-group">
+        <label>নিয়েছি ↓ <span style="color:var(--green)">(Take)</span></label>
+        <input type="number" id="takeAmount" placeholder="0" min="0" inputmode="decimal" oninput="updateSmsPreview()">
+      </div>
+      <div class="form-group">
+        <label>দিয়েছি ↑ <span style="color:var(--accent)">(Give)</span></label>
+        <input type="number" id="giveAmount" placeholder="0" min="0" inputmode="decimal" oninput="updateSmsPreview()">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>কারণ (Reason)</label>
+      <textarea id="reason" placeholder="ঐচ্ছিক — কারণ বা নোট লিখুন"></textarea>
+    </div>
+  </div>
+
+  <div class="sms-option" id="smsOption">
+    <label class="sms-checkbox-row">
+      <input type="checkbox" id="sendSms" onchange="updateSmsPreview()">
+      <div>
+        <div class="sms-label">📱 SMS পাঠাবো (আমার নম্বর থেকে)</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px">চেক করলে সেভের পর Messages App খুলবে</div>
+      </div>
+    </label>
+    <div class="sms-preview" id="smsPreview"></div>
+  </div>
+
+  <button class="btn btn-primary" onclick="submitForm()" id="submitBtn">সেভ করুন</button>
+</div>
+
+<!-- SUMMARY PAGE -->
+<div id="page-summary" class="page">
+  <div class="month-picker">
+    <button class="month-nav" onclick="changeMonth(-1)">◀</button>
+    <select id="monthPicker" onchange="loadSummary()"></select>
+    <button class="month-nav" onclick="changeMonth(1)">▶</button>
+  </div>
+  <div class="summary-grid">
+    <div class="sum-card"><div class="sum-label">💵 মোট আয়</div><div class="sum-amount income" id="sumIncome">৳০</div></div>
+    <div class="sum-card"><div class="sum-label">💸 মোট খরচ</div><div class="sum-amount expense" id="sumExpense">৳০</div></div>
+  </div>
+  <div class="summary-grid">
+    <div class="sum-card"><div class="sum-label">💵 Paycheck</div><div class="sum-amount paycheck" id="sumPaycheck">৳০</div></div>
+    <div class="sum-card"><div class="sum-label">💰 ব্যালেন্স</div><div class="sum-amount balance" id="sumBalance">৳০</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">ক্যাটাগরি ভিত্তিক</div>
+    <div id="breakdownList"></div>
+  </div>
+</div>
+
+<!-- LOAN PAGE -->
+<div id="page-loan" class="page">
+  <div class="loan-tabs">
+    <div class="loan-tab" id="tab-give" onclick="showLoanSection('give')">💚 আমি পাবো</div>
+    <div class="loan-tab" id="tab-take" onclick="showLoanSection('take')">🔴 আমি দেবো</div>
+    <div class="loan-tab" id="tab-credit" onclick="showLoanSection('credit')">🟡 বাকি</div>
+  </div>
+  <div id="loanContent"><div class="empty-state"><span class="ei">💰</span>উপরের ট্যাব থেকে দেখুন</div></div>
+</div>
+
+<!-- HISTORY PAGE -->
+<div id="page-history" class="page">
+  <div class="filter-row" id="historyFilters">
+    <div class="filter-chip active" onclick="filterHistory('all',this)">সব</div>
+    <div class="filter-chip" onclick="filterHistory('Paycheck',this)">Paycheck</div>
+    <div class="filter-chip" onclick="filterHistory('Giving Loan',this)">লোন দিয়েছি</div>
+    <div class="filter-chip" onclick="filterHistory('Taking Loan',this)">লোন নিয়েছি</div>
+    <div class="filter-chip" onclick="filterHistory('Loan repaid',this)">লোন ফেরত</div>
+    <div class="filter-chip" onclick="filterHistory('Credit Purchase',this)">বাকি</div>
+    <div class="filter-chip" onclick="filterHistory('Food',this)">খাবার</div>
+  </div>
+  <div id="historyContent"></div>
+</div>
+
+<!-- SETTINGS PAGE -->
+<div id="page-settings" class="page">
+  <div class="card">
+    <div class="card-title">আপনার তথ্য</div>
+    <div class="form-group"><label>আপনার নাম (SMS-এ যাবে)</label><input type="text" id="settingMyName" placeholder="যেমন: Shohel"></div>
+    <button class="btn btn-teal" onclick="saveSettings()">সেটিং সেভ করুন</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📱 SMS কীভাবে কাজ করে</div>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.8">
+      ✅ SMS চেক করে সেভ করুন<br>
+      ✅ Google Sheets এ সেভ হবে<br>
+      ✅ আপনার ফোনের Messages App খুলবে<br>
+      ✅ নম্বর ও মেসেজ লেখা থাকবে<br>
+      ✅ শুধু <strong>Send</strong> চাপুন — আপনার SIM থেকে যাবে!
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Firebase সংযোগ</div>
+    <div id="firebaseStatusCard" style="font-size:13px;color:var(--text-muted)">চেক করা হচ্ছে...</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">অফলাইন ডেটা</div>
+    <div class="setting-item">
+      <div><div class="setting-label">পেন্ডিং সিঙ্ক</div><div class="setting-sub" id="pendingCount">০ টি</div></div>
+      <button class="btn btn-outline btn-sm" onclick="syncOfflineData()">সিঙ্ক করুন</button>
+    </div>
+    <div class="setting-item">
+      <div><div class="setting-label">সব লোকাল ডেটা মুছুন</div><div class="setting-sub">Firebase এ থাকবে</div></div>
+      <button class="btn btn-sm" style="background:var(--accent);color:#fff" onclick="clearLocalData()">মুছুন</button>
+    </div>
+  </div>
+  <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px">হিসাবনিকাশ v3.0 · Firebase · PWA</div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, where, orderBy, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+// ═══════════════════════════════════════
+// FIREBASE CONFIG
+// ═══════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyBTjkbxwsyuY0aHOnGf38vT49S86xFrl4c",
+  authDomain: "hisabnikash-a0aa2.firebaseapp.com",
+  projectId: "hisabnikash-a0aa2",
+  storageBucket: "hisabnikash-a0aa2.firebasestorage.app",
+  messagingSenderId: "391846781823",
+  appId: "1:391846781823:web:89116fc2d0cbc583aab04a"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Offline persistence
+try {
+  await enableIndexedDbPersistence(db);
+} catch(e) {}
+
+// ═══════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════
+const PHONE_REQ = ['Giving Loan','Taking Loan','Loan Paid','Credit Purchase','Credit Purchase Loan Paid','Loan repaid'];
+const SMS_CATS  = ['Giving Loan','Taking Loan','Loan Paid','Credit Purchase','Credit Purchase Loan Paid','Loan repaid'];
+
+let settings = {};
+let allExpenses = [];
+let networkCache = {};
+let currentHistoryFilter = 'all';
+let activeLoanSection = null;
+
+// ═══════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════
+function loadSettings() {
+  const s = localStorage.getItem('hn_settings_v3');
+  if (s) settings = JSON.parse(s);
+  document.getElementById('settingMyName').value = settings.myName || '';
+}
+
+window.saveSettings = function() {
+  settings = { myName: document.getElementById('settingMyName').value.trim() };
+  localStorage.setItem('hn_settings_v3', JSON.stringify(settings));
+  showToast('✅ সেটিং সেভ হয়েছে', 'success');
+};
+
+// ═══════════════════════════════════════
+// ONLINE STATUS
+// ═══════════════════════════════════════
+function updateOnlineStatus() {
+  const badge = document.getElementById('syncBadge');
+  if (navigator.onLine) {
+    badge.textContent = '● অনলাইন';
+    badge.className = 'sync-badge online';
+  } else {
+    badge.textContent = '● অফলাইন';
+    badge.className = 'sync-badge offline';
+  }
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+
+// ═══════════════════════════════════════
+// LOAD ALL EXPENSES FROM FIREBASE
+// ═══════════════════════════════════════
+async function loadExpenses() {
+  try {
+    const snap = await getDocs(query(collection(db, 'expenses'), orderBy('dateTimeISO', 'desc')));
+    allExpenses = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    updateQueueBadge();
+
+    // Update firebase status
+    document.getElementById('firebaseStatusCard').innerHTML =
+      '<span style="color:var(--green)">✅ Firebase সংযুক্ত — ডেটা সিঙ্ক হচ্ছে</span>';
+  } catch(e) {
+    console.warn('Load error:', e);
+    document.getElementById('firebaseStatusCard').innerHTML =
+      '<span style="color:var(--accent)">❌ ' + e.message + '</span>';
+  }
+}
+
+async function loadNetworkContacts() {
+  try {
+    const snap = await getDocs(collection(db, 'network'));
+    snap.docs.forEach(d => { networkCache[d.id] = d.data().name; });
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════
+// CATEGORY CHANGE
+// ═══════════════════════════════════════
+window.onCategoryChange = function() {
+  const cat = document.getElementById('category').value;
+  document.getElementById('phoneReq').textContent = PHONE_REQ.includes(cat) ? '*' : '';
+  const smsEl = document.getElementById('smsOption');
+  if (SMS_CATS.includes(cat)) smsEl.classList.add('show');
+  else { smsEl.classList.remove('show'); document.getElementById('sendSms').checked = false; }
+  document.getElementById('smsPreview').classList.remove('show');
+};
+
+// ═══════════════════════════════════════
+// PHONE AUTOFILL
+// ═══════════════════════════════════════
+let phoneTimer = null;
+window.onPhoneInput = async function() {
+  const phone = document.getElementById('phone').value.trim();
+  document.getElementById('autofillBadge').style.display = 'none';
+  clearTimeout(phoneTimer);
+  if (phone.length < 8) return;
+  phoneTimer = setTimeout(async () => {
+    // Check local cache
+    if (networkCache[phone]) {
+      document.getElementById('name').value = networkCache[phone];
+      document.getElementById('autofillBadge').style.display = 'inline-block';
+      return;
+    }
+    // Check Firebase
+    try {
+      const ref = doc(db, 'network', phone);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        const name = snap.data().name;
+        document.getElementById('name').value = name;
+        networkCache[phone] = name;
+        document.getElementById('autofillBadge').style.display = 'inline-block';
+      }
+    } catch(e) {}
+  }, 500);
+};
+
+// ═══════════════════════════════════════
+// SMS PREVIEW
+// ═══════════════════════════════════════
+window.updateSmsPreview = function() {
+  const cat = document.getElementById('category').value;
+  const name = document.getElementById('name').value.trim() || '?';
+  const take = parseFloat(document.getElementById('takeAmount').value) || 0;
+  const give = parseFloat(document.getElementById('giveAmount').value) || 0;
+  const myName = settings.myName || 'আমি';
+  const checked = document.getElementById('sendSms').checked;
+  const preview = document.getElementById('smsPreview');
+  if (!checked) { preview.classList.remove('show'); return; }
+
+  let msg = '';
+  if (cat==='Giving Loan') msg=`${name}, ${myName} আপনাকে ${give} টাকা লোন দিয়েছেন।`;
+  else if (cat==='Taking Loan') msg=`${name}, ${myName} আপনার কাছ থেকে ${take} টাকা লোন নিয়েছেন।`;
+  else if (cat==='Loan Paid') msg=`${name}, ${myName} ${give} টাকা পরিশোধ করেছেন।`;
+  else if (cat==='Credit Purchase') msg=`${name}, ${myName} ${take} টাকার বাকি কিনেছেন।`;
+  else if (cat==='Credit Purchase Loan Paid') msg=`${name}, ${myName} ${give} টাকা বাকি পরিশোধ করেছেন।`;
+  else if (cat==='Loan repaid') msg=`${myName}, ${name} আপনার ${take} টাকা ফেরত দিয়েছেন।`;
+
+  if (msg) { preview.textContent = '📩 ' + msg; preview.classList.add('show'); }
+};
+document.getElementById('name').addEventListener('input', window.updateSmsPreview);
+
+// ═══════════════════════════════════════
+// FORM SUBMIT
+// ═══════════════════════════════════════
+window.submitForm = async function() {
+  const cat = document.getElementById('category').value;
+  const phone = document.getElementById('phone').value.trim();
+  const name = document.getElementById('name').value.trim();
+  const take = parseFloat(document.getElementById('takeAmount').value) || 0;
+  const give = parseFloat(document.getElementById('giveAmount').value) || 0;
+  const reason = document.getElementById('reason').value.trim();
+  const sendSms = document.getElementById('sendSms').checked;
+
+  // Validation
+  if (!cat) { showToast('❌ ক্যাটাগরি বেছে নিন', 'error'); return; }
+  if (PHONE_REQ.includes(cat) && !phone) {
+    document.getElementById('phoneError').classList.add('show');
+    document.getElementById('phone').classList.add('error');
+    showToast('❌ ফোন নম্বর দিন', 'error'); return;
+  }
+  if (take === 0 && give === 0) { showToast('❌ টাকার পরিমাণ দিন', 'error'); return; }
+
+  document.getElementById('phoneError').classList.remove('show');
+  document.getElementById('phone').classList.remove('error');
+
+  const btn = document.getElementById('submitBtn');
+  btn.innerHTML = '<span class="spinner"></span>সেভ হচ্ছে...';
+  btn.disabled = true;
+
+  const now = new Date();
+  const entry = {
+    dateTime: now.toLocaleString('bn-BD', {timeZone:'Asia/Dhaka'}),
+    dateTimeISO: now.toISOString(),
+    monthKey: now.toISOString().slice(0,7),
+    category: cat, name, phone,
+    takeAmount: take, giveAmount: give, reason,
+    createdAt: now.getTime()
+  };
+
+  try {
+    // Save to Firebase
+    const docRef = await addDoc(collection(db, 'expenses'), entry);
+    entry.id = docRef.id;
+    allExpenses.unshift(entry);
+
+    // Save contact
+    if (phone && name) {
+      await setDoc(doc(db, 'network', phone), {name, phone});
+      networkCache[phone] = name;
+    }
+
+    showToast('✅ Firebase এ সেভ হয়েছে!', 'success');
+    resetForm();
+    updateQueueBadge();
+
+    // SMS — open Messages App
+    if (sendSms && phone) {
+      setTimeout(() => openSmsApp(entry), 800);
+    }
+
+  } catch(e) {
+    showToast('❌ Error: ' + e.message, 'error');
+    console.error(e);
+  }
+
+  btn.innerHTML = 'সেভ করুন';
+  btn.disabled = false;
+};
+
+// ═══════════════════════════════════════
+// OPEN SMS APP
+// ═══════════════════════════════════════
+function openSmsApp(entry) {
+  const myName = settings.myName || 'আমি';
+  const name = entry.name || '';
+  const take = entry.takeAmount || 0;
+  const give = entry.giveAmount || 0;
+  const cat = entry.category;
+  let msg = '';
+  if (cat==='Giving Loan') msg=`${name}, ${myName} আপনাকে ${give} টাকা লোন দিয়েছেন।`;
+  else if (cat==='Taking Loan') msg=`${name}, ${myName} আপনার কাছ থেকে ${take} টাকা লোন নিয়েছেন।`;
+  else if (cat==='Loan Paid') msg=`${name}, ${myName} ${give} টাকা পরিশোধ করেছেন।`;
+  else if (cat==='Credit Purchase') msg=`${name}, ${myName} ${take} টাকার বাকি কিনেছেন।`;
+  else if (cat==='Credit Purchase Loan Paid') msg=`${name}, ${myName} ${give} টাকা বাকি পরিশোধ করেছেন।`;
+  else if (cat==='Loan repaid') msg=`${myName}, ${name} আপনার ${take} টাকা ফেরত দিয়েছেন।`;
+  if (!msg || !entry.phone) return;
+  window.location.href = `sms:${entry.phone}?body=${encodeURIComponent(msg)}`;
+}
+
+function resetForm() {
+  ['category','phone','name','takeAmount','giveAmount','reason'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('sendSms').checked = false;
+  document.getElementById('smsOption').classList.remove('show');
+  document.getElementById('smsPreview').classList.remove('show');
+  document.getElementById('autofillBadge').style.display = 'none';
+  document.getElementById('phoneReq').textContent = '';
+}
+
+// ═══════════════════════════════════════
+// QUEUE BADGE
+// ═══════════════════════════════════════
+function updateQueueBadge() {
+  document.getElementById('queueCount').textContent = '০';
+  document.getElementById('queueNotice').classList.remove('show');
+  document.getElementById('pendingCount').textContent = 'সব সিঙ্ক হয়েছে ✅';
+}
+
+window.syncOfflineData = function() { showToast('✅ Firebase সব সিঙ্ক করে', 'success'); };
+window.clearLocalData = function() {
+  if (!confirm('লোকাল cache মুছবেন?')) return;
+  networkCache = {};
+  showToast('✅ Cache মুছা হয়েছে', 'success');
+};
+
+// ═══════════════════════════════════════
+// SUMMARY
+// ═══════════════════════════════════════
+function buildMonthOptions() {
+  const sel = document.getElementById('monthPicker');
+  sel.innerHTML = '';
+  const now = new Date();
+  for (let i = 0; i < 24; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const val = d.toISOString().slice(0,7);
+    const label = d.toLocaleString('bn-BD', {month:'long', year:'numeric'});
+    const opt = document.createElement('option');
+    opt.value = val; opt.textContent = label;
+    sel.appendChild(opt);
+  }
+}
+
+window.changeMonth = function(dir) {
+  const sel = document.getElementById('monthPicker');
+  const idx = sel.selectedIndex + dir;
+  if (idx >= 0 && idx < sel.options.length) { sel.selectedIndex = idx; loadSummary(); }
+};
+
+window.loadSummary = function() {
+  const month = document.getElementById('monthPicker').value;
+  const filtered = allExpenses.filter(e => e.monthKey === month || (e.dateTimeISO && e.dateTimeISO.startsWith(month)));
+  let income=0, expense=0, paycheck=0;
+  const catTotals = {};
+  for (const e of filtered) {
+    const cat = e.category;
+    if (cat==='Paycheck') { income+=e.takeAmount||0; paycheck+=e.takeAmount||0; }
+    else if (cat==='Loan repaid') income+=e.takeAmount||0;
+    else expense+=e.giveAmount||0;
+    const amt=(e.takeAmount||0)+(e.giveAmount||0);
+    if (amt>0) catTotals[cat]=(catTotals[cat]||0)+amt;
+  }
+  const balance=income-expense;
+  document.getElementById('sumIncome').textContent='৳'+income.toLocaleString('bn-BD');
+  document.getElementById('sumExpense').textContent='৳'+expense.toLocaleString('bn-BD');
+  document.getElementById('sumPaycheck').textContent='৳'+paycheck.toLocaleString('bn-BD');
+  document.getElementById('sumBalance').textContent='৳'+balance.toLocaleString('bn-BD');
+  document.getElementById('sumBalance').style.color=balance>=0?'var(--green)':'var(--accent)';
+  const list=document.getElementById('breakdownList');
+  if (!Object.keys(catTotals).length) { list.innerHTML='<div style="color:var(--text-muted);font-size:13px;padding:10px 0">এই মাসে কোনো এন্ট্রি নেই</div>'; return; }
+  list.innerHTML=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).map(([cat,amt])=>`
+    <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:14px">${cat}</span>
+      <span style="font-weight:700;color:var(--teal)">৳${amt.toLocaleString('bn-BD')}</span>
+    </div>`).join('');
+};
+
+// ═══════════════════════════════════════
+// LOAN DASHBOARD
+// ═══════════════════════════════════════
+window.showLoanSection = function(type) {
+  activeLoanSection = type;
+  ['give','take','credit'].forEach(t => document.getElementById('tab-'+t).className='loan-tab');
+  const cls = type==='give'?'ag':type==='take'?'at':'ac';
+  document.getElementById('tab-'+type).className='loan-tab '+cls;
+  const content=document.getElementById('loanContent');
+  if (type==='give') {
+    const map=buildMap(allExpenses,'Giving Loan','Loan repaid','giveAmount','takeAmount');
+    content.innerHTML=renderMap(map,'give','💚 আমি পাবো (যাদের লোন দিয়েছি)');
+  } else if (type==='take') {
+    const map=buildMap(allExpenses,'Taking Loan','Loan Paid','takeAmount','giveAmount');
+    content.innerHTML=renderMap(map,'take','🔴 আমি দেবো (যার কাছে লোন আছে)');
+  } else {
+    const map=buildMap(allExpenses,'Credit Purchase','Credit Purchase Loan Paid','takeAmount','giveAmount');
+    content.innerHTML=renderMap(map,'credit','🟡 বাকি কেনাকাটা');
+  }
+};
+
+function buildMap(all, loanCat, paidCat, loanKey, paidKey) {
+  const map={};
+  for (const e of all) {
+    const key=e.phone||e.name||'অজানা';
+    if (!map[key]) map[key]={name:e.name,phone:e.phone,total:0,paid:0};
+    if (e.category===loanCat) map[key].total+=e[loanKey]||0;
+    if (e.category===paidCat) map[key].paid+=e[paidKey]||0;
+  }
+  return map;
+}
+
+function renderMap(map, type, title) {
+  const entries=Object.values(map).filter(v=>v.total>0);
+  if (!entries.length) return `<div class="empty-state"><span class="ei">✨</span>কোনো রেকর্ড নেই</div>`;
+  let html=`<div class="loan-section-title">${title}</div>`;
+  let any=false;
+  for (const v of entries) {
+    const rem=v.total-v.paid;
+    if (rem<=0) continue;
+    any=true;
+    html+=`<div class="loan-item">
+      <div><div class="loan-item-name">${v.name||'অজানা'}</div><div class="loan-item-phone">${v.phone||''}</div></div>
+      <div class="loan-amounts">
+        <div class="loan-remaining ${type}">৳${rem.toLocaleString('bn-BD')}</div>
+        <div class="loan-meta">মোট: ৳${v.total.toLocaleString('bn-BD')} | পরিশোধ: ৳${v.paid.toLocaleString('bn-BD')}</div>
+      </div>
+    </div>`;
+  }
+  if (!any) html+=`<div class="empty-state"><span class="ei">✅</span>সব পরিশোধ হয়েছে!</div>`;
+  return html;
+}
+
+// ═══════════════════════════════════════
+// HISTORY
+// ═══════════════════════════════════════
+function loadHistory(filter='all') {
+  const filtered=filter==='all'?allExpenses:allExpenses.filter(e=>e.category===filter);
+  const content=document.getElementById('historyContent');
+  if (!filtered.length) { content.innerHTML='<div class="empty-state"><span class="ei">📭</span>কোনো এন্ট্রি নেই</div>'; return; }
+  content.innerHTML=filtered.slice(0,100).map(e=>{
+    const isP=e.category==='Paycheck';
+    const mainAmt=e.takeAmount>0?e.takeAmount:e.giveAmount;
+    const type=isP?'paycheck':e.takeAmount>0?'take':'give';
+    const reasonLine=e.reason?`<div class="history-reason">📝 ${e.reason}</div>`:'';
+    return `<div class="history-item ${type}">
+      <div class="history-top">
+        <span class="history-cat">${e.category}</span>
+        <span class="history-amount ${type}">৳${(mainAmt||0).toLocaleString('bn-BD')}</span>
+      </div>
+      <div class="history-name">${e.name||'—'}${e.phone?' · '+e.phone:''}</div>
+      ${reasonLine}
+      <div class="history-date">${e.dateTime||''}</div>
+    </div>`;
+  }).join('');
+}
+
+window.filterHistory = function(cat, el) {
+  currentHistoryFilter=cat;
+  document.querySelectorAll('#historyFilters .filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  loadHistory(cat);
+};
+
+// ═══════════════════════════════════════
+// PAGE NAV
+// ═══════════════════════════════════════
+window.showPage = function(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const tabs=['form','summary','loan','history','settings'];
+  document.querySelectorAll('.nav-tab')[tabs.indexOf(name)].classList.add('active');
+  if (name==='history') loadHistory(currentHistoryFilter);
+  if (name==='loan') window.showLoanSection(activeLoanSection||'give');
+  if (name==='summary') window.loadSummary();
+};
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+let toastTimer;
+window.showToast = function(msg, type='info') {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className=`toast show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),3000);
+};
+function showToast(msg,type){window.showToast(msg,type);}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+loadSettings();
+buildMonthOptions();
+await loadExpenses();
+await loadNetworkContacts();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+showToast('✅ Firebase সংযুক্ত!', 'success');
+
+</script>
+</body>
+</html>

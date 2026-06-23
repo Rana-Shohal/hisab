@@ -12,14 +12,41 @@
 :root{--bg:#0f0f1a;--sur:#1a1a2e;--card:#16213e;--red:#e94560;--teal:#00b4d8;--grn:#06d6a0;--yel:#ffd166;--pur:#9b5de5;--txt:#eaeaea;--mut:#8892a4;--bdr:#2a2a4a;--inp:#0d0d1f}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:75px;font-size:15px}
-.top{background:var(--sur);padding:13px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:50}
-.ttl{font-size:19px;font-weight:800}.ttl span{color:var(--red)}
-.bdg{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:700}
+/* LOGIN */
+#loginPage{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;padding:24px}
+#loginPage.hide{display:none}
+.lbox{background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:28px 22px;width:100%;max-width:360px}
+.llogo{font-size:28px;font-weight:800;text-align:center;margin-bottom:4px}.llogo span{color:var(--red)}
+.lsub{font-size:13px;color:var(--mut);text-align:center;margin-bottom:24px}
+.lfg{margin-bottom:14px}
+.lfg label{display:block;font-size:12px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.lfg input{width:100%;background:var(--inp);border:1.5px solid var(--bdr);border-radius:8px;padding:12px;color:var(--txt);font-size:16px;outline:none;-webkit-appearance:none}
+.lfg input:focus{border-color:var(--teal)}
+.lbtn{width:100%;padding:14px;border:none;border-radius:8px;font-size:16px;font-weight:800;background:linear-gradient(135deg,var(--red),#c41e3a);color:#fff;cursor:pointer;margin-bottom:10px}
+.lbtn:active{opacity:.85}
+.lerr{font-size:13px;color:var(--red);margin-top:8px;text-align:center;display:none}
+.lerr.show{display:block}
+.ldiv{display:flex;align-items:center;gap:10px;margin:14px 0}
+.ldiv::before,.ldiv::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.ldiv span{font-size:12px;color:var(--mut)}
+.gbtn{width:100%;padding:13px;border:1.5px solid var(--bdr);border-radius:8px;background:var(--card);color:var(--txt);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
+.gbtn img{width:20px}
+.ltoggle{text-align:center;margin-top:14px;font-size:13px;color:var(--mut)}
+.ltoggle a{color:var(--teal);cursor:pointer;font-weight:700}
+/* TOP */
+.top{background:var(--sur);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:50}
+.ttl{font-size:18px;font-weight:800}.ttl span{color:var(--red)}
+.topR{display:flex;align-items:center;gap:8px}
+.bdg{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:700}
 .bdg.on{background:rgba(6,214,160,.15);color:var(--grn)}.bdg.off{background:rgba(233,69,96,.15);color:var(--red)}
+.avt{width:30px;height:30px;border-radius:50%;border:2px solid var(--bdr);background:var(--red);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;cursor:pointer;overflow:hidden}
+.avt img{width:100%;height:100%;object-fit:cover}
+/* TABS */
 .tabs{display:flex;background:var(--sur);border-bottom:1px solid var(--bdr)}
 .tab{flex:1;padding:10px 3px;text-align:center;font-size:11px;font-weight:700;color:var(--mut);cursor:pointer;border-bottom:3px solid transparent}
 .tab.act{color:var(--red);border-color:var(--red)}
 .ti{font-size:15px;display:block;margin-bottom:1px}
+/* PAGES */
 .pg{display:none;padding:14px}.pg.act{display:block}
 .card{background:var(--card);border-radius:12px;padding:15px;margin-bottom:12px;border:1px solid var(--bdr)}
 .ctit{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--mut);margin-bottom:13px}
@@ -39,7 +66,6 @@ select option{background:#1a1a2e}
 .sbox.show{display:block}
 .schk{display:flex;align-items:center;gap:10px;cursor:pointer}
 .schk input[type=checkbox]{width:20px;height:20px;accent-color:var(--grn)}
-.sl{font-size:14px;font-weight:700}
 .sp{margin-top:9px;background:var(--inp);border-radius:8px;padding:9px;font-size:13px;color:var(--mut);line-height:1.6;display:none}
 .sp.show{display:block}
 .btn{width:100%;padding:14px;border:none;border-radius:8px;font-size:16px;font-weight:800;cursor:pointer}
@@ -48,8 +74,10 @@ select option{background:#1a1a2e}
 .btn-t{background:linear-gradient(135deg,var(--teal),#0077b6);color:#fff}
 .btn-o{background:transparent;border:1.5px solid var(--bdr);color:var(--txt)}
 .btn-s{width:auto;padding:7px 14px;font-size:13px}
+.btn-lo{background:rgba(233,69,96,.1);border:1px solid rgba(233,69,96,.3);color:var(--red);border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;width:100%}
 .qn{background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.3);border-radius:8px;padding:9px 13px;font-size:13px;color:var(--yel);margin-bottom:12px;display:none;gap:7px;align-items:center}
 .qn.show{display:flex}
+/* SUMMARY */
 .sg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
 .sc{background:var(--card);border-radius:8px;padding:13px;border:1px solid var(--bdr)}
 .sla{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--mut);margin-bottom:5px}
@@ -58,6 +86,7 @@ select option{background:#1a1a2e}
 .mp{display:flex;gap:7px;margin-bottom:12px;align-items:center}
 .mp select{flex:1}
 .mn{background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:8px 14px;color:var(--txt);font-size:17px;cursor:pointer;font-weight:700}
+/* LOAN */
 .lt{display:flex;gap:7px;margin-bottom:13px}
 .ltb{flex:1;padding:10px 5px;border-radius:8px;text-align:center;cursor:pointer;border:1.5px solid var(--bdr);font-size:12px;font-weight:700;color:var(--mut);line-height:1.4}
 .ltb.ag{border-color:var(--grn);color:var(--grn);background:rgba(6,214,160,.08)}
@@ -65,16 +94,18 @@ select option{background:#1a1a2e}
 .ltb.ac{border-color:var(--yel);color:var(--yel);background:rgba(255,209,102,.08)}
 .li{background:var(--card);border-radius:8px;padding:12px;margin-bottom:8px;border:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center}
 .ln{font-weight:700;font-size:15px}.lp{font-size:12px;color:var(--mut);margin-top:2px}
-.lr{font-size:18px;font-weight:800}.lr.g{color:var(--grn)}.lr.t{color:var(--red)}.lr.c{color:var(--yel)}
+.lr{font-size:18px;font-weight:800}
+.lr.g{color:var(--grn)}.lr.t{color:var(--red)}.lr.c{color:var(--yel)}
 .lm{font-size:11px;color:var(--mut);margin-top:2px}
 .ltt{font-size:14px;font-weight:800;margin:14px 0 9px}
+/* HISTORY */
 .hi{background:var(--card);border-radius:8px;padding:11px 12px;margin-bottom:7px;border:1px solid var(--bdr);border-left:4px solid var(--bdr)}
 .hi.tk{border-left-color:var(--grn)}.hi.gv{border-left-color:var(--red)}.hi.pc{border-left-color:var(--pur)}
 .hh{display:flex;justify-content:space-between}
 .hc{font-size:11px;font-weight:800;color:var(--teal);text-transform:uppercase}
 .ha{font-weight:800;font-size:16px}
 .ha.tk{color:var(--grn)}.ha.gv{color:var(--red)}.ha.pc{color:var(--pur)}
-.hn{font-size:13px;margin-top:3px}.hr{font-size:12px;color:var(--mut);font-style:italic;margin-top:2px}.hd{font-size:11px;color:var(--mut);margin-top:2px}
+.hn{font-size:13px;margin-top:3px}.hrz{font-size:12px;color:var(--mut);font-style:italic;margin-top:2px}.hd{font-size:11px;color:var(--mut);margin-top:2px}
 .fr{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:3px}
 .fr::-webkit-scrollbar{display:none}
 .fc{flex-shrink:0;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid var(--bdr);color:var(--mut);cursor:pointer;background:transparent}
@@ -82,384 +113,548 @@ select option{background:#1a1a2e}
 .si2{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--bdr)}
 .empty{text-align:center;padding:32px 16px;color:var(--mut)}
 .ei{font-size:40px;display:block;margin-bottom:7px}
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:flex-end}
+.modal.show{display:flex}
+.mbox{background:var(--sur);border-radius:16px 16px 0 0;padding:20px;width:100%}
+/* TOAST */
 .toast{position:fixed;bottom:85px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--card);border:1px solid var(--bdr);padding:10px 18px;border-radius:24px;font-size:14px;font-weight:700;opacity:0;transition:.25s;z-index:999;white-space:nowrap;max-width:88vw;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{border-color:var(--grn);color:var(--grn)}.toast.er{border-color:var(--red);color:var(--red)}.toast.in{border-color:var(--teal);color:var(--teal)}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 
-<div class="top">
-  <div class="ttl">হিসাব<span>নিকাশ</span></div>
-  <div id="nbdg" class="bdg off">● অফলাইন</div>
-</div>
-<div class="tabs">
-  <div class="tab act" data-p="form"><span class="ti">✏️</span>এন্ট্রি</div>
-  <div class="tab" data-p="summary"><span class="ti">📊</span>সারসংক্ষেপ</div>
-  <div class="tab" data-p="loan"><span class="ti">💰</span>লোন</div>
-  <div class="tab" data-p="history"><span class="ti">📋</span>ইতিহাস</div>
-  <div class="tab" data-p="settings"><span class="ti">⚙️</span>সেটিং</div>
-</div>
-<div id="toast" class="toast"></div>
+<!-- LOGIN -->
+<div id="loginPage">
+  <div class="lbox">
+    <div class="llogo">হিসাব<span>নিকাশ</span></div>
+    <div class="lsub">লগইন করুন — যেকোনো ডিভাইস থেকে ডেটা দেখুন</div>
 
-<!-- FORM -->
-<div id="page-form" class="pg act">
-  <div id="qn" class="qn">⏳ <span id="qc">0</span> টি অফলাইনে আছে — অনলাইনে এলে সিঙ্ক হবে</div>
-  <div class="card">
-    <div class="ctit">নতুন এন্ট্রি</div>
-    <div class="fg">
-      <label>ক্যাটাগরি <span class="req">*</span></label>
-      <select id="cat">
-        <option value="">-- বেছে নিন --</option>
-        <optgroup label="💵 আয়">
-          <option value="Paycheck">💵 Paycheck</option>
-          <option value="Loan repaid">✅ Loan Repaid</option>
-        </optgroup>
-        <optgroup label="💸 খরচ">
-          <option value="Food">🍽️ Food</option>
-          <option value="Gifts">🎁 Gifts</option>
-          <option value="Health/Medical">🏥 Health/Medical</option>
-          <option value="Bike Cost">🏍️ Bike Cost</option>
-          <option value="Transportation">🚌 Transportation</option>
-          <option value="Personal">👤 Personal</option>
-          <option value="Net & Electricity Bill">💡 Net & Electricity Bill</option>
-          <option value="Travel">✈️ Travel</option>
-          <option value="Donate">❤️ Donate</option>
-          <option value="Savings">🏦 Savings</option>
-          <option value="Other">📌 Other</option>
-        </optgroup>
-        <optgroup label="🤝 লোন/বাকি">
-          <option value="Giving Loan">💸 Giving Loan</option>
-          <option value="Taking Loan">🤝 Taking Loan</option>
-          <option value="Loan Paid">✅ Loan Paid</option>
-          <option value="Credit Purchase">🛒 Credit Purchase</option>
-          <option value="Credit Purchase Loan Paid">✅ Credit Purchase Paid</option>
-        </optgroup>
-      </select>
+    <div id="loginForm">
+      <div class="lfg"><label>Gmail</label><input type="email" id="lemail" placeholder="your@gmail.com" inputmode="email"></div>
+      <div class="lfg"><label>পাসওয়ার্ড</label><input type="password" id="lpass" placeholder="••••••••"></div>
+      <button class="lbtn" id="loginBtn">লগইন করুন</button>
+      <div class="lerr" id="lerr"></div>
+      <div class="ltoggle">নতুন? <a id="toRegister">রেজিস্ট্রেশন করুন</a></div>
     </div>
-    <div class="fg">
-      <label>ফোন নম্বর <span class="req" id="preq"></span></label>
-      <input type="tel" id="phone" placeholder="01XXXXXXXXX" inputmode="numeric">
-      <div class="fe" id="perr">এই ক্যাটাগরিতে ফোন আবশ্যক</div>
-      <div class="ht">নম্বর দিলে নাম অটো-ফিল হবে</div>
+
+    <div id="registerForm" style="display:none">
+      <div class="lfg"><label>আপনার নাম</label><input type="text" id="rname" placeholder="নাম লিখুন"></div>
+      <div class="lfg"><label>Gmail</label><input type="email" id="remail" placeholder="your@gmail.com" inputmode="email"></div>
+      <div class="lfg"><label>পাসওয়ার্ড</label><input type="password" id="rpass" placeholder="কমপক্ষে ৬ অক্ষর"></div>
+      <button class="lbtn" id="registerBtn">রেজিস্ট্রেশন করুন</button>
+      <div class="lerr" id="rerr"></div>
+      <div class="ltoggle">আগেই আছেন? <a id="toLogin">লগইন করুন</a></div>
     </div>
-    <div class="fg">
-      <label>নাম</label>
-      <input type="text" id="name" placeholder="নাম লিখুন">
-      <div class="ab" id="abadge">✓ অটো-ফিল হয়েছে</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appDiv" style="display:none">
+  <div class="top">
+    <div class="ttl">হিসাব<span>নিকাশ</span></div>
+    <div class="topR">
+      <div id="nbdg" class="bdg off">● অফলাইন</div>
+      <div class="avt" id="avtBtn">?</div>
     </div>
-    <div class="ar">
+  </div>
+  <div class="tabs">
+    <div class="tab act" data-p="form"><span class="ti">✏️</span>এন্ট্রি</div>
+    <div class="tab" data-p="summary"><span class="ti">📊</span>সারসংক্ষেপ</div>
+    <div class="tab" data-p="loan"><span class="ti">💰</span>লোন</div>
+    <div class="tab" data-p="history"><span class="ti">📋</span>ইতিহাস</div>
+    <div class="tab" data-p="settings"><span class="ti">⚙️</span>সেটিং</div>
+  </div>
+  <div id="toast" class="toast"></div>
+
+  <!-- FORM -->
+  <div id="page-form" class="pg act">
+    <div id="qn" class="qn">⏳ <span id="qc">0</span> টি অফলাইনে আছে</div>
+    <div class="card">
+      <div class="ctit">নতুন এন্ট্রি</div>
       <div class="fg">
-        <label>নিয়েছি ↓ <span style="color:var(--grn)">Take</span></label>
-        <input type="number" id="take" placeholder="0" min="0" inputmode="decimal">
+        <label>ক্যাটাগরি <span class="req">*</span></label>
+        <select id="cat">
+          <option value="">-- বেছে নিন --</option>
+          <optgroup label="💵 আয়">
+            <option value="Paycheck">💵 Paycheck</option>
+            <option value="Loan repaid">✅ Loan Repaid</option>
+          </optgroup>
+          <optgroup label="💸 খরচ">
+            <option value="Food">🍽️ Food</option>
+            <option value="Gifts">🎁 Gifts</option>
+            <option value="Health/Medical">🏥 Health/Medical</option>
+            <option value="Bike Cost">🏍️ Bike Cost</option>
+            <option value="Transportation">🚌 Transportation</option>
+            <option value="Personal">👤 Personal</option>
+            <option value="Net & Electricity Bill">💡 Net & Electricity Bill</option>
+            <option value="Travel">✈️ Travel</option>
+            <option value="Donate">❤️ Donate</option>
+            <option value="Savings">🏦 Savings</option>
+            <option value="Other">📌 Other</option>
+          </optgroup>
+          <optgroup label="🤝 লোন/বাকি">
+            <option value="Giving Loan">💸 Giving Loan</option>
+            <option value="Taking Loan">🤝 Taking Loan</option>
+            <option value="Loan Paid">✅ Loan Paid</option>
+            <option value="Credit Purchase">🛒 Credit Purchase</option>
+            <option value="Credit Purchase Loan Paid">✅ Credit Purchase Paid</option>
+          </optgroup>
+        </select>
       </div>
       <div class="fg">
-        <label>দিয়েছি ↑ <span style="color:var(--red)">Give</span></label>
-        <input type="number" id="give" placeholder="0" min="0" inputmode="decimal">
+        <label>ফোন নম্বর <span class="req" id="preq"></span></label>
+        <input type="tel" id="phone" placeholder="01XXXXXXXXX" inputmode="numeric">
+        <div class="fe" id="perr">এই ক্যাটাগরিতে ফোন আবশ্যক</div>
+        <div class="ht">নম্বর দিলে নাম অটো-ফিল হবে</div>
+      </div>
+      <div class="fg">
+        <label>নাম</label>
+        <input type="text" id="fname" placeholder="নাম লিখুন">
+        <div class="ab" id="abadge">✓ অটো-ফিল</div>
+      </div>
+      <div class="ar">
+        <div class="fg">
+          <label>নিয়েছি ↓ <span style="color:var(--grn)">Take</span></label>
+          <input type="number" id="take" placeholder="0" min="0" inputmode="decimal">
+        </div>
+        <div class="fg">
+          <label>দিয়েছি ↑ <span style="color:var(--red)">Give</span></label>
+          <input type="number" id="give" placeholder="0" min="0" inputmode="decimal">
+        </div>
+      </div>
+      <div class="fg">
+        <label>কারণ</label>
+        <textarea id="reason" placeholder="ঐচ্ছিক নোট..."></textarea>
       </div>
     </div>
-    <div class="fg">
-      <label>কারণ</label>
-      <textarea id="reason" placeholder="ঐচ্ছিক নোট..."></textarea>
+    <div class="sbox" id="sbox">
+      <label class="schk">
+        <input type="checkbox" id="doSms">
+        <div><div style="font-size:14px;font-weight:700">📱 SMS পাঠাবো</div>
+        <div class="ht">সেভের পর Messages App খুলবে</div></div>
+      </label>
+      <div class="sp" id="sprev"></div>
     </div>
+    <button class="btn btn-r" id="saveBtn">সেভ করুন</button>
   </div>
-  <div class="sbox" id="sbox">
-    <label class="schk">
-      <input type="checkbox" id="doSms">
-      <div><div class="sl">📱 SMS পাঠাবো (আমার SIM থেকে)</div>
-      <div class="ht">সেভের পর Messages App খুলবে</div></div>
-    </label>
-    <div class="sp" id="sprev"></div>
-  </div>
-  <button class="btn btn-r" id="saveBtn">সেভ করুন</button>
-</div>
 
-<!-- SUMMARY -->
-<div id="page-summary" class="pg">
-  <div class="mp">
-    <button class="mn" id="mPrev">◀</button>
-    <select id="mSel"></select>
-    <button class="mn" id="mNext">▶</button>
-  </div>
-  <div class="sg">
-    <div class="sc"><div class="sla">💵 মোট আয়</div><div class="sa i" id="sI">৳০</div></div>
-    <div class="sc"><div class="sla">💸 মোট খরচ</div><div class="sa e" id="sE">৳০</div></div>
-  </div>
-  <div class="sg">
-    <div class="sc"><div class="sla">💵 Paycheck</div><div class="sa p" id="sP">৳০</div></div>
-    <div class="sc"><div class="sla">💰 ব্যালেন্স</div><div class="sa b" id="sB">৳০</div></div>
-  </div>
-  <div class="card"><div class="ctit">ক্যাটাগরি ভিত্তিক</div><div id="bdown"></div></div>
-</div>
-
-<!-- LOAN -->
-<div id="page-loan" class="pg">
-  <div class="lt">
-    <div class="ltb" id="lt-give" data-lt="give">💚 আমি<br>পাবো</div>
-    <div class="ltb" id="lt-take" data-lt="take">🔴 আমি<br>দেবো</div>
-    <div class="ltb" id="lt-credit" data-lt="credit">🟡 বাকি<br>কেনাকাটা</div>
-  </div>
-  <div id="lContent"><div class="empty"><span class="ei">💰</span>ট্যাব বেছে নিন</div></div>
-</div>
-
-<!-- HISTORY -->
-<div id="page-history" class="pg">
-  <div class="fr" id="fRow">
-    <div class="fc act" data-f="all">সব</div>
-    <div class="fc" data-f="Paycheck">Paycheck</div>
-    <div class="fc" data-f="Giving Loan">লোন দিয়েছি</div>
-    <div class="fc" data-f="Taking Loan">লোন নিয়েছি</div>
-    <div class="fc" data-f="Loan repaid">লোন ফেরত</div>
-    <div class="fc" data-f="Credit Purchase">বাকি</div>
-    <div class="fc" data-f="Food">খাবার</div>
-  </div>
-  <div id="hContent"></div>
-</div>
-
-<!-- SETTINGS -->
-<div id="page-settings" class="pg">
-  <div class="card">
-    <div class="ctit">আমার তথ্য</div>
-    <div class="fg"><label>আমার নাম (SMS এ যাবে)</label><input type="text" id="myName" placeholder="যেমন: Shohel"></div>
-    <button class="btn btn-t" id="saveSet">সেটিং সেভ করুন</button>
-  </div>
-  <div class="card" style="margin-top:12px">
-    <div class="ctit">Firebase সংযোগ</div>
-    <div id="fbSt" style="font-size:13px;color:var(--mut)">চেক হচ্ছে...</div>
-  </div>
-  <div class="card" style="margin-top:12px">
-    <div class="ctit">ডেটা</div>
-    <div class="si2">
-      <div><div style="font-size:14px;font-weight:600">মোট এন্ট্রি</div><div style="font-size:12px;color:var(--mut)" id="totCnt">০ টি</div></div>
-      <button class="btn btn-o btn-s" id="refBtn">রিফ্রেশ</button>
+  <!-- SUMMARY -->
+  <div id="page-summary" class="pg">
+    <div class="mp">
+      <button class="mn" id="mPrev">◀</button>
+      <select id="mSel"></select>
+      <button class="mn" id="mNext">▶</button>
     </div>
-    <div class="si2">
-      <div><div style="font-size:14px;font-weight:600">পেন্ডিং</div><div style="font-size:12px;color:var(--mut)" id="pendCnt">০ টি</div></div>
-      <button class="btn btn-o btn-s" id="syncBtn">সিঙ্ক করুন</button>
+    <div class="sg">
+      <div class="sc"><div class="sla">💵 মোট আয়</div><div class="sa i" id="sI">৳০</div></div>
+      <div class="sc"><div class="sla">💸 মোট খরচ</div><div class="sa e" id="sE">৳০</div></div>
     </div>
+    <div class="sg">
+      <div class="sc"><div class="sla">💵 Paycheck</div><div class="sa p" id="sP">৳০</div></div>
+      <div class="sc"><div class="sla">💰 ব্যালেন্স</div><div class="sa b" id="sB">৳০</div></div>
+    </div>
+    <div class="card"><div class="ctit">ক্যাটাগরি ভিত্তিক</div><div id="bdown"></div></div>
   </div>
-  <div style="text-align:center;padding:18px;color:var(--mut);font-size:12px">হিসাবনিকাশ v3.0 · Firebase REST · PWA</div>
+
+  <!-- LOAN -->
+  <div id="page-loan" class="pg">
+    <div class="lt">
+      <div class="ltb" id="lt-give" data-lt="give">💚 আমি<br>পাবো</div>
+      <div class="ltb" id="lt-take" data-lt="take">🔴 আমি<br>দেবো</div>
+      <div class="ltb" id="lt-credit" data-lt="credit">🟡 বাকি<br>কেনাকাটা</div>
+    </div>
+    <div id="lContent"><div class="empty"><span class="ei">💰</span>ট্যাব বেছে নিন</div></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div id="page-history" class="pg">
+    <div class="fr">
+      <div class="fc act" data-f="all">সব</div>
+      <div class="fc" data-f="Paycheck">Paycheck</div>
+      <div class="fc" data-f="Giving Loan">লোন দিয়েছি</div>
+      <div class="fc" data-f="Taking Loan">লোন নিয়েছি</div>
+      <div class="fc" data-f="Loan repaid">লোন ফেরত</div>
+      <div class="fc" data-f="Credit Purchase">বাকি</div>
+      <div class="fc" data-f="Food">খাবার</div>
+    </div>
+    <div id="hContent"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="page-settings" class="pg">
+    <div class="card">
+      <div class="ctit">প্রোফাইল</div>
+      <div id="profInfo" style="font-size:14px;margin-bottom:14px"></div>
+      <button class="btn-lo" id="logoutBtn">🚪 লগআউট</button>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <div class="ctit">SMS সেটিং</div>
+      <div class="fg"><label>আমার নাম (SMS এ যাবে)</label><input type="text" id="myName" placeholder="যেমন: Shohel"></div>
+      <button class="btn btn-t" id="saveSet">সেটিং সেভ করুন</button>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <div class="ctit">ডেটা</div>
+      <div class="si2">
+        <div><div style="font-size:14px;font-weight:600">মোট এন্ট্রি</div><div style="font-size:12px;color:var(--mut)" id="totCnt">০ টি</div></div>
+        <button class="btn btn-o btn-s" id="refBtn">রিফ্রেশ</button>
+      </div>
+      <div class="si2">
+        <div><div style="font-size:14px;font-weight:600">পেন্ডিং সিঙ্ক</div><div style="font-size:12px;color:var(--mut)" id="pendCnt">০ টি</div></div>
+        <button class="btn btn-o btn-s" id="syncBtn">সিঙ্ক করুন</button>
+      </div>
+    </div>
+    <div style="text-align:center;padding:18px;color:var(--mut);font-size:12px">হিসাবনিকাশ v4.0 · Firebase Auth · PWA</div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal" id="profModal">
+  <div class="mbox">
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px" id="mName">-</div>
+    <div style="font-size:13px;color:var(--mut);margin-bottom:16px" id="mEmail">-</div>
+    <button class="btn-lo" id="mLogout">🚪 লগআউট</button>
+    <button class="btn btn-o" style="margin-top:10px" id="mClose">বন্ধ করুন</button>
+  </div>
 </div>
 
 <script>
-// ═══════════════════════════════
-// FIREBASE REST API (No SDK!)
-// ═══════════════════════════════
-const FB_PROJECT = 'hisabnikash-a0aa2';
-const FB_KEY = 'AIzaSyBTjkbxwsyuY0aHOnGf38vT49S86xFrl4c';
-const FB_BASE = `https://firestore.googleapis.com/v1/projects/${FB_PROJECT}/databases/(default)/documents`;
+// ══════════════════════════════
+// FIREBASE CONFIG
+// ══════════════════════════════
+const FB_KEY  = 'AIzaSyBTjkbxwsyuY0aHOnGf38vT49S86xFrl4c';
+const FB_PROJ = 'hisabnikash-a0aa2';
+const FS_BASE = `https://firestore.googleapis.com/v1/projects/${FB_PROJ}/databases/(default)/documents`;
+const AUTH_URL= `https://identitytoolkit.googleapis.com/v1/accounts`;
+const TOKEN_URL=`https://securetoken.googleapis.com/v1/token`;
 
-async function fbAdd(col, data) {
-  const fields = toFields(data);
-  const res = await fetch(`${FB_BASE}/${col}?key=${FB_KEY}`, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({fields})
+// ══════════════════════════════
+// STATE
+// ══════════════════════════════
+let USER = null; // {uid, email, displayName, idToken, refreshToken}
+let DATA = [];
+let NET  = {};
+let SET  = {};
+let CUR_F= 'all';
+let CUR_L= null;
+const PREQ=['Giving Loan','Taking Loan','Loan Paid','Credit Purchase','Credit Purchase Loan Paid','Loan repaid'];
+const SMSC=['Giving Loan','Taking Loan','Loan Paid','Credit Purchase','Credit Purchase Loan Paid','Loan repaid'];
+
+// ══════════════════════════════
+// AUTH HELPERS
+// ══════════════════════════════
+async function authReq(endpoint, body) {
+  const r = await fetch(`${AUTH_URL}:${endpoint}?key=${FB_KEY}`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({...body, returnSecureToken:true})
   });
-  if (!res.ok) throw new Error('Firebase write failed: ' + res.status);
-  return await res.json();
+  const j = await r.json();
+  if(j.error) throw new Error(j.error.message);
+  return j;
 }
 
-async function fbSet(col, docId, data) {
-  const fields = toFields(data);
-  const res = await fetch(`${FB_BASE}/${col}/${docId}?key=${FB_KEY}`, {
-    method: 'PATCH',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({fields})
-  });
-  if (!res.ok) throw new Error('Firebase set failed: ' + res.status);
-  return await res.json();
+async function doRegister(email, pass, name) {
+  const j = await authReq('signUp', {email, password:pass});
+  // Update display name
+  await authReq('update', {idToken:j.idToken, displayName:name});
+  return {uid:j.localId, email:j.email, displayName:name, idToken:j.idToken, refreshToken:j.refreshToken};
 }
 
-async function fbGetAll(col) {
-  const res = await fetch(`${FB_BASE}/${col}?key=${FB_KEY}&pageSize=500`);
-  if (!res.ok) throw new Error('Firebase read failed: ' + res.status);
-  const json = await res.json();
-  if (!json.documents) return [];
-  return json.documents.map(d => fromFields(d.fields));
+async function doLogin(email, pass) {
+  const j = await authReq('signInWithPassword', {email, password:pass});
+  return {uid:j.localId, email:j.email, displayName:j.displayName||email.split('@')[0], idToken:j.idToken, refreshToken:j.refreshToken};
 }
 
-async function fbGet(col, docId) {
-  const res = await fetch(`${FB_BASE}/${col}/${docId}?key=${FB_KEY}`);
-  if (res.status === 404) return null;
-  if (!res.ok) return null;
-  const json = await res.json();
-  return fromFields(json.fields);
+async function doRefresh() {
+  if(!USER?.refreshToken) return false;
+  try {
+    const r = await fetch(`${TOKEN_URL}?key=${FB_KEY}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({grant_type:'refresh_token', refresh_token:USER.refreshToken})
+    });
+    const j = await r.json();
+    if(j.id_token) { USER.idToken=j.id_token; USER.refreshToken=j.refresh_token; saveUser(); return true; }
+  } catch(e){}
+  return false;
 }
 
-function toFields(obj) {
-  const f = {};
-  for (const [k,v] of Object.entries(obj)) {
-    if (v === null || v === undefined) f[k] = {nullValue: null};
-    else if (typeof v === 'number') f[k] = {doubleValue: v};
-    else if (typeof v === 'boolean') f[k] = {booleanValue: v};
-    else f[k] = {stringValue: String(v)};
+function saveUser() { localStorage.setItem('hn_u', JSON.stringify(USER)); }
+function loadUser() { const s=localStorage.getItem('hn_u'); if(s){USER=JSON.parse(s);return true;} return false; }
+function clearUser() { USER=null; localStorage.removeItem('hn_u'); }
+
+// ══════════════════════════════
+// FIRESTORE REST
+// ══════════════════════════════
+function hdr() { return USER?{'Authorization':'Bearer '+USER.idToken,'Content-Type':'application/json'}:{'Content-Type':'application/json'}; }
+function uCol(c) { return `users/${USER.uid}/${c}`; }
+
+function toF(o) {
+  const f={};
+  for(const [k,v] of Object.entries(o)) {
+    if(v===null||v===undefined) f[k]={nullValue:null};
+    else if(typeof v==='number') f[k]={doubleValue:v};
+    else f[k]={stringValue:String(v)};
   }
   return f;
 }
-
-function fromFields(fields) {
-  if (!fields) return {};
-  const obj = {};
-  for (const [k,v] of Object.entries(fields)) {
-    if (v.stringValue !== undefined) obj[k] = v.stringValue;
-    else if (v.doubleValue !== undefined) obj[k] = Number(v.doubleValue);
-    else if (v.integerValue !== undefined) obj[k] = Number(v.integerValue);
-    else if (v.booleanValue !== undefined) obj[k] = v.booleanValue;
-    else obj[k] = null;
+function frF(fields) {
+  if(!fields) return {};
+  const o={};
+  for(const [k,v] of Object.entries(fields)) {
+    if(v.stringValue!==undefined) o[k]=v.stringValue;
+    else if(v.doubleValue!==undefined) o[k]=Number(v.doubleValue);
+    else if(v.integerValue!==undefined) o[k]=Number(v.integerValue);
+    else o[k]=null;
   }
-  return obj;
+  return o;
 }
 
-// ═══════════════════════════════
-// INDEXEDDB (offline)
-// ═══════════════════════════════
+async function fsAdd(col, data) {
+  const r = await fetch(`${FS_BASE}/${col}?key=${FB_KEY}`, {
+    method:'POST', headers:hdr(), body:JSON.stringify({fields:toF(data)})
+  });
+  if(r.status===401) { await doRefresh(); return fsAdd(col,data); }
+  if(!r.ok) throw new Error('Write '+ r.status);
+  const j=await r.json();
+  return j.name?j.name.split('/').pop():'';
+}
+async function fsSet(col, id, data) {
+  const r = await fetch(`${FS_BASE}/${col}/${id}?key=${FB_KEY}`, {
+    method:'PATCH', headers:hdr(), body:JSON.stringify({fields:toF(data)})
+  });
+  if(r.status===401) { await doRefresh(); return fsSet(col,id,data); }
+}
+async function fsAll(col) {
+  const r = await fetch(`${FS_BASE}/${col}?key=${FB_KEY}&pageSize=1000`, {headers:hdr()});
+  if(r.status===401) { await doRefresh(); return fsAll(col); }
+  if(!r.ok) throw new Error('Read '+r.status);
+  const j=await r.json();
+  if(!j.documents) return [];
+  return j.documents.map(d=>({fbId:d.name.split('/').pop(),...frF(d.fields)}));
+}
+async function fsGet(col, id) {
+  const r = await fetch(`${FS_BASE}/${col}/${id}?key=${FB_KEY}`, {headers:hdr()});
+  if(r.status===401) { await doRefresh(); return fsGet(col,id); }
+  if(!r.ok) return null;
+  const j=await r.json(); return frF(j.fields);
+}
+
+// ══════════════════════════════
+// INDEXEDDB
+// ══════════════════════════════
 let IDB;
 function openIDB() {
   return new Promise((res,rej) => {
-    const r = indexedDB.open('HisabV3', 1);
-    r.onupgradeneeded = e => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains('expenses'))
-        db.createObjectStore('expenses', {keyPath:'lid', autoIncrement:true});
-      if (!db.objectStoreNames.contains('pending'))
-        db.createObjectStore('pending', {keyPath:'lid', autoIncrement:true});
-      if (!db.objectStoreNames.contains('network'))
-        db.createObjectStore('network', {keyPath:'phone'});
+    const r=indexedDB.open('HisabV5',1);
+    r.onupgradeneeded=e=>{
+      const db=e.target.result;
+      ['expenses','pending','network'].forEach(s=>{
+        if(!db.objectStoreNames.contains(s))
+          db.createObjectStore(s,{keyPath:'lid',autoIncrement:true});
+      });
     };
-    r.onsuccess = e => { IDB = e.target.result; res(); };
-    r.onerror = () => rej();
+    r.onsuccess=e=>{IDB=e.target.result;res();};
+    r.onerror=()=>rej();
   });
 }
-function idbTx(store, mode) { return IDB.transaction(store, mode).objectStore(store); }
-function idbAdd(store, data) { return new Promise((r,j) => { const q=idbTx(store,'readwrite').add(data); q.onsuccess=()=>r(q.result); q.onerror=()=>j(); }); }
-function idbPut(store, data) { return new Promise((r,j) => { const q=idbTx(store,'readwrite').put(data); q.onsuccess=()=>r(); q.onerror=()=>j(); }); }
-function idbGetAll(store) { return new Promise((r,j) => { const q=idbTx(store,'readonly').getAll(); q.onsuccess=()=>r(q.result); q.onerror=()=>r([]); }); }
-function idbDel(store, key) { return new Promise(r => { idbTx(store,'readwrite').delete(key); r(); }); }
-function idbGet(store, key) { return new Promise((r,j) => { const q=idbTx(store,'readonly').get(key); q.onsuccess=()=>r(q.result); q.onerror=()=>r(null); }); }
+const tx=(s,m)=>IDB.transaction(s,m).objectStore(s);
+const iAll=s=>new Promise(r=>{const q=tx(s,'readonly').getAll();q.onsuccess=()=>r(q.result);q.onerror=()=>r([]);});
+const iAdd=(s,d)=>new Promise((r,j)=>{const q=tx(s,'readwrite').add(d);q.onsuccess=()=>r(q.result);q.onerror=()=>j();});
+const iPut=(s,d)=>new Promise(r=>{tx(s,'readwrite').put(d);r();});
+const iDel=(s,k)=>new Promise(r=>{tx(s,'readwrite').delete(k);r();});
+const iClr=s=>new Promise(r=>{tx(s,'readwrite').clear();r();});
+const iGet=(s,k)=>new Promise(r=>{const q=tx(s,'readonly').get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null);});
 
-// ═══════════════════════════════
-// STATE
-// ═══════════════════════════════
-const PREQ = ['Giving Loan','Taking Loan','Loan Paid','Credit Purchase','Credit Purchase Loan Paid','Loan repaid'];
-const SMSC = ['Giving Loan','Taking Loan','Loan Paid','Credit Purchase','Credit Purchase Loan Paid','Loan repaid'];
-let allData = [];
-let netCache = {};
-let mySet = {};
-let curF = 'all';
-let curL = null;
-
-// ═══════════════════════════════
-// SETTINGS
-// ═══════════════════════════════
-function loadSet() {
-  const s = localStorage.getItem('hn3'); if(s) mySet = JSON.parse(s);
-  document.getElementById('myName').value = mySet.myName || '';
-}
-document.getElementById('saveSet').onclick = () => {
-  mySet.myName = document.getElementById('myName').value.trim();
-  localStorage.setItem('hn3', JSON.stringify(mySet));
-  toast('✅ সেভ হয়েছে', 'ok');
+// ══════════════════════════════
+// LOGIN UI
+// ══════════════════════════════
+document.getElementById('toRegister').onclick=()=>{
+  document.getElementById('loginForm').style.display='none';
+  document.getElementById('registerForm').style.display='block';
+};
+document.getElementById('toLogin').onclick=()=>{
+  document.getElementById('registerForm').style.display='none';
+  document.getElementById('loginForm').style.display='block';
 };
 
-// ═══════════════════════════════
-// ONLINE
-// ═══════════════════════════════
-function updateNet() {
-  const b = document.getElementById('nbdg');
-  if (navigator.onLine) { b.textContent='● অনলাইন'; b.className='bdg on'; }
-  else { b.textContent='● অফলাইন'; b.className='bdg off'; }
-}
-window.addEventListener('online', () => { updateNet(); syncPending(); });
-window.addEventListener('offline', updateNet);
-
-// ═══════════════════════════════
-// LOAD DATA
-// ═══════════════════════════════
-async function loadData() {
-  // Load from local IDB first (instant)
-  allData = await idbGetAll('expenses');
-  allData.sort((a,b) => (b.createdAt||0)-(a.createdAt||0));
-  renderHistory(); renderSummary();
-  document.getElementById('totCnt').textContent = allData.length + ' টি';
-
-  // Then sync from Firebase if online
-  if (!navigator.onLine) return;
+document.getElementById('loginBtn').onclick=async function() {
+  const email=document.getElementById('lemail').value.trim();
+  const pass=document.getElementById('lpass').value;
+  const err=document.getElementById('lerr');
+  if(!email||!pass){err.textContent='Email ও Password দিন';err.classList.add('show');return;}
+  this.innerHTML='<span class="spin"></span>লগইন হচ্ছে...';this.disabled=true;
   try {
-    const remote = await fbGetAll('expenses');
-    // Merge remote into local IDB
-    const localIds = new Set(allData.map(e=>e.fbId).filter(Boolean));
-    for (const r of remote) {
-      if (r.fbId && !localIds.has(r.fbId)) {
-        r.synced = true;
-        await idbAdd('expenses', r);
-      }
-    }
-    // Reload
-    allData = await idbGetAll('expenses');
-    allData.sort((a,b) => (b.createdAt||0)-(a.createdAt||0));
-    renderHistory(); renderSummary();
-    document.getElementById('totCnt').textContent = allData.length + ' টি';
-
-    // Load network
-    const net = await fbGetAll('network');
-    for (const n of net) {
-      if (n.phone) { netCache[n.phone] = n.name; await idbPut('network', n); }
-    }
-    document.getElementById('fbSt').innerHTML = '<span style="color:var(--grn)">✅ Firebase সংযুক্ত</span>';
+    USER=await doLogin(email,pass);
+    saveUser();
+    showApp();
   } catch(e) {
-    document.getElementById('fbSt').innerHTML = '<span style="color:var(--red)">❌ '+e.message+'</span>';
+    let msg='লগইন ব্যর্থ। Email ও Password চেক করুন।';
+    if(e.message.includes('INVALID')) msg='Email বা Password ভুল।';
+    if(e.message.includes('TOO_MANY')) msg='অনেকবার চেষ্টা করেছেন। একটু পরে আবার করুন।';
+    err.textContent=msg;err.classList.add('show');
   }
+  this.innerHTML='লগইন করুন';this.disabled=false;
+};
+
+document.getElementById('registerBtn').onclick=async function() {
+  const name=document.getElementById('rname').value.trim();
+  const email=document.getElementById('remail').value.trim();
+  const pass=document.getElementById('rpass').value;
+  const err=document.getElementById('rerr');
+  if(!name||!email||!pass){err.textContent='সব তথ্য দিন';err.classList.add('show');return;}
+  if(pass.length<6){err.textContent='Password কমপক্ষে ৬ অক্ষর';err.classList.add('show');return;}
+  this.innerHTML='<span class="spin"></span>রেজিস্ট্রেশন হচ্ছে...';this.disabled=true;
+  try {
+    USER=await doRegister(email,pass,name);
+    saveUser();
+    showApp();
+  } catch(e) {
+    let msg='রেজিস্ট্রেশন ব্যর্থ।';
+    if(e.message.includes('EMAIL_EXISTS')) msg='এই Email আগেই আছে। লগইন করুন।';
+    if(e.message.includes('WEAK_PASSWORD')) msg='Password অনেক দুর্বল।';
+    err.textContent=msg;err.classList.add('show');
+  }
+  this.innerHTML='রেজিস্ট্রেশন করুন';this.disabled=false;
+};
+
+// Enter key support
+['lpass','lemail'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginBtn').click();}));
+['rpass','remail','rname'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('registerBtn').click();}));
+
+// ══════════════════════════════
+// SHOW APP
+// ══════════════════════════════
+function showApp() {
+  document.getElementById('loginPage').classList.add('hide');
+  document.getElementById('appDiv').style.display='block';
+  // Avatar
+  const av=document.getElementById('avtBtn');
+  av.textContent=(USER.displayName||USER.email||'?')[0].toUpperCase();
+  // Profile info
+  document.getElementById('profInfo').innerHTML=`<strong>${USER.displayName||''}</strong><br><span style="color:var(--mut);font-size:13px">${USER.email||''}</span>`;
+  document.getElementById('mName').textContent=USER.displayName||'';
+  document.getElementById('mEmail').textContent=USER.email||'';
+  loadSet();
+  buildMonths();
+  updateNet();
+  loadData();
+  updateQBadge();
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
 
-// ═══════════════════════════════
-// CATEGORY CHANGE
-// ═══════════════════════════════
-document.getElementById('cat').onchange = function() {
-  const c = this.value;
-  document.getElementById('preq').textContent = PREQ.includes(c)?'*':'';
-  const b = document.getElementById('sbox');
-  if (SMSC.includes(c)) b.classList.add('show');
-  else { b.classList.remove('show'); document.getElementById('doSms').checked=false; }
+function logout() {
+  clearUser();
+  DATA=[];NET={};
+  iClr('expenses');iClr('pending');iClr('network');
+  document.getElementById('appDiv').style.display='none';
+  document.getElementById('loginPage').classList.remove('hide');
+  document.getElementById('profModal').classList.remove('show');
+}
+document.getElementById('logoutBtn').onclick=document.getElementById('mLogout').onclick=logout;
+document.getElementById('avtBtn').onclick=()=>document.getElementById('profModal').classList.add('show');
+document.getElementById('mClose').onclick=()=>document.getElementById('profModal').classList.remove('show');
+document.getElementById('profModal').onclick=function(e){if(e.target===this)this.classList.remove('show');};
+
+// ══════════════════════════════
+// ONLINE
+// ══════════════════════════════
+function updateNet() {
+  const b=document.getElementById('nbdg');
+  if(navigator.onLine){b.textContent='● অনলাইন';b.className='bdg on';}
+  else{b.textContent='● অফলাইন';b.className='bdg off';}
+}
+window.addEventListener('online',()=>{updateNet();syncPending();});
+window.addEventListener('offline',updateNet);
+
+// ══════════════════════════════
+// LOAD DATA
+// ══════════════════════════════
+async function loadData() {
+  // Show local data first
+  const local=await iAll('expenses');
+  DATA=local.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  renderAll();
+  document.getElementById('totCnt').textContent=DATA.length+' টি';
+
+  if(!navigator.onLine) return;
+  try {
+    await doRefresh();
+    const remote=await fsAll(uCol('expenses'));
+    // Replace local with Firebase data
+    await iClr('expenses');
+    for(const r of remote) {
+      const d={...r,lid:undefined};delete d.lid;
+      await iAdd('expenses',d);
+    }
+    DATA=remote.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    renderAll();
+    document.getElementById('totCnt').textContent=DATA.length+' টি';
+    // Load network
+    const net=await fsAll(uCol('network'));
+    await iClr('network');
+    for(const n of net){if(n.phone){NET[n.phone]=n.name;await iAdd('network',{lid:undefined,...n});}}
+  } catch(e){ console.warn(e); toast('⚠️ '+e.message,'er'); }
+}
+
+function renderAll() {
+  renderHistory();
+  renderSummary();
+  if(CUR_L) renderLoan(CUR_L);
+}
+
+// ══════════════════════════════
+// CATEGORY
+// ══════════════════════════════
+document.getElementById('cat').onchange=function(){
+  const c=this.value;
+  document.getElementById('preq').textContent=PREQ.includes(c)?'*':'';
+  const b=document.getElementById('sbox');
+  if(SMSC.includes(c)) b.classList.add('show');
+  else{b.classList.remove('show');document.getElementById('doSms').checked=false;}
   document.getElementById('sprev').classList.remove('show');
 };
 
-// ═══════════════════════════════
+// ══════════════════════════════
 // PHONE AUTOFILL
-// ═══════════════════════════════
+// ══════════════════════════════
 let pT;
-document.getElementById('phone').oninput = function() {
+document.getElementById('phone').oninput=function(){
   clearTimeout(pT);
-  const ph = this.value.trim();
+  const ph=this.value.trim();
   document.getElementById('abadge').style.display='none';
-  if (ph.length < 8) return;
-  pT = setTimeout(async () => {
-    let name = netCache[ph];
-    if (!name) {
-      const local = await idbGet('network', ph);
-      if (local) name = local.name;
+  if(ph.length<8) return;
+  pT=setTimeout(async()=>{
+    let name=NET[ph];
+    if(!name){
+      // Check local
+      const all=await iAll('network');
+      const found=all.find(n=>n.phone===ph);
+      if(found) name=found.name;
     }
-    if (!name && navigator.onLine) {
-      const r = await fbGet('network', ph);
-      if (r && r.name) { name=r.name; netCache[ph]=name; await idbPut('network',{phone:ph,name}); }
+    if(!name&&navigator.onLine){
+      const r=await fsGet(uCol('network'),ph);
+      if(r?.name){name=r.name;NET[ph]=name;await iAdd('network',{phone:ph,name});}
     }
-    if (name) {
-      document.getElementById('name').value = name;
-      document.getElementById('abadge').style.display = 'inline-block';
+    if(name){
+      document.getElementById('fname').value=name;
+      document.getElementById('abadge').style.display='inline-block';
       updSms();
     }
-  }, 500);
+  },500);
 };
 
-// ═══════════════════════════════
+// ══════════════════════════════
 // SMS PREVIEW
-// ═══════════════════════════════
-function updSms() {
+// ══════════════════════════════
+function updSms(){
   const c=document.getElementById('cat').value;
-  const n=document.getElementById('name').value.trim()||'?';
+  const n=document.getElementById('fname').value.trim()||'?';
   const tk=parseFloat(document.getElementById('take').value)||0;
   const gv=parseFloat(document.getElementById('give').value)||0;
-  const me=mySet.myName||'আমি';
+  const me=SET.myName||USER?.displayName||'আমি';
   const chk=document.getElementById('doSms').checked;
   const pr=document.getElementById('sprev');
   if(!chk){pr.classList.remove('show');return;}
@@ -472,16 +667,16 @@ function updSms() {
   else if(c==='Loan repaid') msg=`${me}, ${n} আপনার ${tk} টাকা ফেরত দিয়েছেন।`;
   if(msg){pr.textContent='📩 '+msg;pr.classList.add('show');}
 }
-['name','take','give'].forEach(id=>document.getElementById(id).addEventListener('input',updSms));
-document.getElementById('doSms').onchange = updSms;
+['fname','take','give'].forEach(id=>document.getElementById(id).addEventListener('input',updSms));
+document.getElementById('doSms').onchange=updSms;
 
-// ═══════════════════════════════
+// ══════════════════════════════
 // SAVE
-// ═══════════════════════════════
-document.getElementById('saveBtn').onclick = async function() {
+// ══════════════════════════════
+document.getElementById('saveBtn').onclick=async function(){
   const cat=document.getElementById('cat').value;
   const phone=document.getElementById('phone').value.trim();
-  const name=document.getElementById('name').value.trim();
+  const name=document.getElementById('fname').value.trim();
   const take=parseFloat(document.getElementById('take').value)||0;
   const give=parseFloat(document.getElementById('give').value)||0;
   const reason=document.getElementById('reason').value.trim();
@@ -497,7 +692,7 @@ document.getElementById('saveBtn').onclick = async function() {
   document.getElementById('perr').classList.remove('show');
   document.getElementById('phone').classList.remove('err');
 
-  this.textContent='সেভ হচ্ছে...'; this.disabled=true;
+  this.innerHTML='<span class="spin"></span>সেভ হচ্ছে...';this.disabled=true;
 
   const now=new Date();
   const entry={
@@ -505,71 +700,68 @@ document.getElementById('saveBtn').onclick = async function() {
     dateTimeISO:now.toISOString(),
     monthKey:now.toISOString().slice(0,7),
     createdAt:now.getTime(),
-    category:cat, name, phone, takeAmount:take, giveAmount:give, reason,
-    synced:false
+    category:cat,name,phone,
+    takeAmount:take,giveAmount:give,reason
   };
 
-  // Save local first
-  const lid = await idbAdd('expenses', entry);
-  entry.lid = lid;
-  allData.unshift(entry);
-  document.getElementById('totCnt').textContent = allData.length + ' টি';
+  // Save local
+  const lid=await iAdd('expenses',{...entry});
+  DATA.unshift({...entry,lid});
+  document.getElementById('totCnt').textContent=DATA.length+' টি';
 
-  // Save contact local
-  if(phone&&name){ await idbPut('network',{phone,name}); netCache[phone]=name; }
-
-  if(navigator.onLine) {
-    // Queue for Firebase
-    await idbAdd('pending', {...entry});
-    await syncPending();
+  if(navigator.onLine){
+    try{
+      await doRefresh();
+      const fbId=await fsAdd(uCol('expenses'),entry);
+      if(phone&&name) await fsSet(uCol('network'),phone,{name,phone});
+      NET[phone]=name;
+      toast('✅ Firebase এ সেভ হয়েছে!','ok');
+    }catch(e){
+      await iAdd('pending',{...entry,lid});
+      toast('📴 অফলাইনে সেভ, পরে সিঙ্ক হবে','in');
+    }
   } else {
-    await idbAdd('pending', {...entry});
-    updateQBadge();
+    await iAdd('pending',{...entry,lid});
     toast('📴 অফলাইনে সেভ হয়েছে','in');
   }
 
+  updateQBadge();
   resetForm();
+  renderAll();
   if(doSms&&phone) setTimeout(()=>openSMS(entry),600);
-  this.textContent='সেভ করুন'; this.disabled=false;
+  this.innerHTML='সেভ করুন';this.disabled=false;
 };
 
-// ═══════════════════════════════
-// SYNC PENDING
-// ═══════════════════════════════
-async function syncPending() {
-  if(!navigator.onLine) return;
-  const pending = await idbGetAll('pending');
+// ══════════════════════════════
+// SYNC
+// ══════════════════════════════
+async function syncPending(){
+  if(!navigator.onLine||!USER) return;
+  const pending=await iAll('pending');
   if(!pending.length){updateQBadge();return;}
-  let synced=0;
-  for(const e of pending) {
-    try {
-      const lid=e.lid; delete e.lid;
-      const ref = await fbAdd('expenses', {...e, fbId: ''});
-      // Get the doc name as fbId
-      const fbId = ref.name ? ref.name.split('/').pop() : Date.now().toString();
-      // Update local with synced=true
-      const local = await idbGet('expenses', lid);
-      if(local){ local.synced=true; local.fbId=fbId; await idbPut('expenses',local); }
-      // Save contact to Firebase
-      if(e.phone&&e.name) await fbSet('network', e.phone, {name:e.name,phone:e.phone});
-      await idbDel('pending', lid);
-      synced++;
-    } catch(err){ console.warn('Sync error',err); }
+  await doRefresh();
+  let n=0;
+  for(const e of pending){
+    try{
+      const lid=e.lid;
+      const d={...e};delete d.lid;
+      await fsAdd(uCol('expenses'),d);
+      if(e.phone&&e.name) await fsSet(uCol('network'),e.phone,{name:e.name,phone:e.phone});
+      await iDel('pending',lid);
+      n++;
+    }catch(err){console.warn(err);}
   }
-  if(synced>0) toast(`✅ ${synced} টি Firebase এ সিঙ্ক হয়েছে`,'ok');
+  if(n>0) toast(`✅ ${n} টি সিঙ্ক হয়েছে`,'ok');
   updateQBadge();
 }
-
-async function updateQBadge() {
-  const p = await idbGetAll('pending');
-  const n = p.length;
-  document.getElementById('qc').textContent = n;
-  document.getElementById('qn').classList.toggle('show', n>0);
-  document.getElementById('pendCnt').textContent = n + ' টি';
+async function updateQBadge(){
+  const p=await iAll('pending');const n=p.length;
+  document.getElementById('qc').textContent=n;
+  document.getElementById('qn').classList.toggle('show',n>0);
+  document.getElementById('pendCnt').textContent=n+' টি';
 }
-
-function resetForm() {
-  ['cat','phone','name','take','give','reason'].forEach(id=>document.getElementById(id).value='');
+function resetForm(){
+  ['cat','phone','fname','take','give','reason'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('doSms').checked=false;
   document.getElementById('sbox').classList.remove('show');
   document.getElementById('sprev').classList.remove('show');
@@ -577,11 +769,12 @@ function resetForm() {
   document.getElementById('preq').textContent='';
 }
 
-// ═══════════════════════════════
+// ══════════════════════════════
 // SMS
-// ═══════════════════════════════
-function openSMS(e) {
-  const me=mySet.myName||'আমি',n=e.name||'',tk=e.takeAmount||0,gv=e.giveAmount||0,c=e.category;
+// ══════════════════════════════
+function openSMS(e){
+  const me=SET.myName||USER?.displayName||'আমি';
+  const n=e.name||'',tk=e.takeAmount||0,gv=e.giveAmount||0,c=e.category;
   let msg='';
   if(c==='Giving Loan') msg=`${n}, ${me} আপনাকে ${gv} টাকা লোন দিয়েছেন।`;
   else if(c==='Taking Loan') msg=`${n}, ${me} আপনার কাছ থেকে ${tk} টাকা লোন নিয়েছেন।`;
@@ -593,11 +786,11 @@ function openSMS(e) {
   window.location.href=`sms:${e.phone}?body=${encodeURIComponent(msg)}`;
 }
 
-// ═══════════════════════════════
+// ══════════════════════════════
 // SUMMARY
-// ═══════════════════════════════
-function buildMonths() {
-  const s=document.getElementById('mSel'); s.innerHTML='';
+// ══════════════════════════════
+function buildMonths(){
+  const s=document.getElementById('mSel');s.innerHTML='';
   const now=new Date();
   for(let i=0;i<24;i++){
     const d=new Date(now.getFullYear(),now.getMonth()-i,1);
@@ -607,36 +800,41 @@ function buildMonths() {
     s.appendChild(o);
   }
 }
-function renderSummary() {
+function renderSummary(){
   const m=document.getElementById('mSel').value;
-  const rows=allData.filter(e=>(e.monthKey||e.dateTimeISO||'').startsWith(m));
-  let i=0,ex=0,p=0; const cats={};
+  const rows=DATA.filter(e=>{
+    const mk=e.monthKey||(e.dateTimeISO?e.dateTimeISO.slice(0,7):'');
+    return mk===m;
+  });
+  let inc=0,exp=0,pay=0;const cats={};
   for(const e of rows){
-    const c=e.category,tk=e.takeAmount||0,gv=e.giveAmount||0;
-    if(c==='Paycheck'){i+=tk;p+=tk;}else if(c==='Loan repaid')i+=tk;else ex+=gv;
-    const a=tk+gv; if(a>0)cats[c]=(cats[c]||0)+a;
+    const c=e.category,tk=Number(e.takeAmount)||0,gv=Number(e.giveAmount)||0;
+    if(c==='Paycheck'){inc+=tk;pay+=tk;}
+    else if(c==='Loan repaid') inc+=tk;
+    else exp+=gv;
+    const a=tk+gv;if(a>0)cats[c]=(cats[c]||0)+a;
   }
-  const b=i-ex;
-  document.getElementById('sI').textContent='৳'+i.toLocaleString('bn-BD');
-  document.getElementById('sE').textContent='৳'+ex.toLocaleString('bn-BD');
-  document.getElementById('sP').textContent='৳'+p.toLocaleString('bn-BD');
-  document.getElementById('sB').textContent='৳'+b.toLocaleString('bn-BD');
-  document.getElementById('sB').style.color=b>=0?'var(--grn)':'var(--red)';
+  const bal=inc-exp;
+  document.getElementById('sI').textContent='৳'+inc.toLocaleString('bn-BD');
+  document.getElementById('sE').textContent='৳'+exp.toLocaleString('bn-BD');
+  document.getElementById('sP').textContent='৳'+pay.toLocaleString('bn-BD');
+  document.getElementById('sB').textContent='৳'+bal.toLocaleString('bn-BD');
+  document.getElementById('sB').style.color=bal>=0?'var(--grn)':'var(--red)';
   const bd=document.getElementById('bdown');
-  const ents=Object.entries(cats).sort((a,b2)=>b2[1]-a[1]);
+  const ents=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
   if(!ents.length){bd.innerHTML='<div style="color:var(--mut);font-size:13px;padding:8px 0">এই মাসে কোনো এন্ট্রি নেই</div>';return;}
   bd.innerHTML=ents.map(([c,a])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr)"><span style="font-size:14px">${c}</span><span style="font-weight:700;color:var(--teal)">৳${a.toLocaleString('bn-BD')}</span></div>`).join('');
 }
-document.getElementById('mSel').onchange = renderSummary;
-document.getElementById('mPrev').onclick = () => { const s=document.getElementById('mSel'); if(s.selectedIndex<s.options.length-1){s.selectedIndex++;renderSummary();} };
-document.getElementById('mNext').onclick = () => { const s=document.getElementById('mSel'); if(s.selectedIndex>0){s.selectedIndex--;renderSummary();} };
+document.getElementById('mSel').onchange=renderSummary;
+document.getElementById('mPrev').onclick=()=>{const s=document.getElementById('mSel');if(s.selectedIndex<s.options.length-1){s.selectedIndex++;renderSummary();}};
+document.getElementById('mNext').onclick=()=>{const s=document.getElementById('mSel');if(s.selectedIndex>0){s.selectedIndex--;renderSummary();}};
 
-// ═══════════════════════════════
+// ══════════════════════════════
 // LOAN
-// ═══════════════════════════════
+// ══════════════════════════════
 document.querySelectorAll('.ltb').forEach(t=>t.onclick=()=>renderLoan(t.dataset.lt));
-function renderLoan(type) {
-  curL=type;
+function renderLoan(type){
+  CUR_L=type;
   document.querySelectorAll('.ltb').forEach(t=>t.className='ltb');
   document.getElementById('lt-'+type).className='ltb '+(type==='give'?'ag':type==='take'?'at':'ac');
   let lC,pC,lK,pK,tit;
@@ -644,46 +842,45 @@ function renderLoan(type) {
   else if(type==='take'){lC='Taking Loan';pC='Loan Paid';lK='takeAmount';pK='giveAmount';tit='🔴 আমি দেবো';}
   else{lC='Credit Purchase';pC='Credit Purchase Loan Paid';lK='takeAmount';pK='giveAmount';tit='🟡 বাকি কেনাকাটা';}
   const map={};
-  for(const e of allData){
+  for(const e of DATA){
     const k=e.phone||e.name||'?';
     if(!map[k])map[k]={name:e.name,phone:e.phone,total:0,paid:0};
-    if(e.category===lC)map[k].total+=e[lK]||0;
-    if(e.category===pC)map[k].paid+=e[pK]||0;
+    if(e.category===lC)map[k].total+=Number(e[lK])||0;
+    if(e.category===pC)map[k].paid+=Number(e[pK])||0;
   }
-  const ents=Object.values(map).filter(v=>v.total>0);
   let html=`<div class="ltt">${tit}</div>`;let any=false;
-  for(const v of ents){
-    const rem=v.total-v.paid; if(rem<=0)continue; any=true;
+  for(const v of Object.values(map)){
+    const rem=v.total-v.paid;if(rem<=0)continue;any=true;
     const tc=type==='give'?'g':type==='take'?'t':'c';
-    html+=`<div class="li"><div><div class="ln">${v.name||'অজানা'}</div><div class="lp">${v.phone||''}</div></div><div><div class="lr ${tc}">৳${rem.toLocaleString('bn-BD')}</div><div class="lm">মোট ৳${v.total.toLocaleString('bn-BD')} | পরিশোধ ৳${v.paid.toLocaleString('bn-BD')}</div></div></div>`;
+    html+=`<div class="li"><div><div class="ln">${v.name||'অজানা'}</div><div class="lp">${v.phone||''}</div></div><div style="text-align:right"><div class="lr ${tc}">৳${rem.toLocaleString('bn-BD')}</div><div class="lm">মোট ৳${v.total.toLocaleString('bn-BD')} | পরিশোধ ৳${v.paid.toLocaleString('bn-BD')}</div></div></div>`;
   }
   if(!any)html+=`<div class="empty"><span class="ei">✅</span>সব পরিশোধ হয়েছে!</div>`;
   document.getElementById('lContent').innerHTML=html;
 }
 
-// ═══════════════════════════════
+// ══════════════════════════════
 // HISTORY
-// ═══════════════════════════════
+// ══════════════════════════════
 document.querySelectorAll('.fc').forEach(c=>c.onclick=function(){
   document.querySelectorAll('.fc').forEach(x=>x.classList.remove('act'));
-  this.classList.add('act'); curF=this.dataset.f; renderHistory();
+  this.classList.add('act');CUR_F=this.dataset.f;renderHistory();
 });
-function renderHistory() {
-  const rows=curF==='all'?allData:allData.filter(e=>e.category===curF);
+function renderHistory(){
+  const rows=CUR_F==='all'?DATA:DATA.filter(e=>e.category===CUR_F);
   const el=document.getElementById('hContent');
   if(!rows.length){el.innerHTML='<div class="empty"><span class="ei">📭</span>কোনো এন্ট্রি নেই</div>';return;}
   el.innerHTML=rows.slice(0,100).map(e=>{
     const isP=e.category==='Paycheck';
-    const a=e.takeAmount>0?e.takeAmount:e.giveAmount;
-    const t=isP?'pc':e.takeAmount>0?'tk':'gv';
-    const rln=e.reason?`<div class="hr">📝 ${e.reason}</div>`:'';
+    const a=Number(e.takeAmount)>0?Number(e.takeAmount):Number(e.giveAmount);
+    const t=isP?'pc':Number(e.takeAmount)>0?'tk':'gv';
+    const rln=e.reason?`<div class="hrz">📝 ${e.reason}</div>`:'';
     return `<div class="hi ${t}"><div class="hh"><span class="hc">${e.category}</span><span class="ha ${t}">৳${(a||0).toLocaleString('bn-BD')}</span></div><div class="hn">${e.name||'—'}${e.phone?' · '+e.phone:''}</div>${rln}<div class="hd">${e.dateTime||''}</div></div>`;
   }).join('');
 }
 
-// ═══════════════════════════════
+// ══════════════════════════════
 // TABS
-// ═══════════════════════════════
+// ══════════════════════════════
 document.querySelectorAll('.tab').forEach(t=>t.onclick=function(){
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('act'));
   document.querySelectorAll('.pg').forEach(x=>x.classList.remove('act'));
@@ -692,36 +889,41 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=function(){
   const p=this.dataset.p;
   if(p==='summary')renderSummary();
   if(p==='history')renderHistory();
-  if(p==='loan'&&curL)renderLoan(curL);
+  if(p==='loan'&&CUR_L)renderLoan(CUR_L);
 });
 
-// ═══════════════════════════════
+// ══════════════════════════════
+// SETTINGS
+// ══════════════════════════════
+function loadSet(){
+  const s=localStorage.getItem('hn_set');if(s)SET=JSON.parse(s);
+  document.getElementById('myName').value=SET.myName||'';
+}
+document.getElementById('saveSet').onclick=()=>{
+  SET.myName=document.getElementById('myName').value.trim();
+  localStorage.setItem('hn_set',JSON.stringify(SET));
+  toast('✅ সেটিং সেভ হয়েছে','ok');
+};
+document.getElementById('refBtn').onclick=async()=>{await loadData();toast('✅ রিফ্রেশ হয়েছে','ok');};
+document.getElementById('syncBtn').onclick=syncPending;
+
+// ══════════════════════════════
 // TOAST
-// ═══════════════════════════════
+// ══════════════════════════════
 let tT;
 function toast(msg,type='in'){
   const e=document.getElementById('toast');
-  e.textContent=msg; e.className=`toast show ${type}`;
-  clearTimeout(tT); tT=setTimeout(()=>e.classList.remove('show'),3000);
+  e.textContent=msg;e.className=`toast show ${type}`;
+  clearTimeout(tT);tT=setTimeout(()=>e.classList.remove('show'),3000);
 }
 
-// ═══════════════════════════════
-// BUTTONS
-// ═══════════════════════════════
-document.getElementById('refBtn').onclick = async () => { await loadData(); toast('✅ রিফ্রেশ হয়েছে','ok'); };
-document.getElementById('syncBtn').onclick = async () => { await syncPending(); toast('✅ সিঙ্ক হয়েছে','ok'); };
-
-// ═══════════════════════════════
+// ══════════════════════════════
 // INIT
-// ═══════════════════════════════
-async function init() {
+// ══════════════════════════════
+async function init(){
   await openIDB();
-  loadSet();
-  buildMonths();
-  updateNet();
-  await updateQBadge();
-  await loadData();
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+  if(loadUser()) showApp();
+  // else login page is already visible
 }
 init();
 </script>

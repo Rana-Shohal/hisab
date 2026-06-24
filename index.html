@@ -134,20 +134,20 @@ select option{background:#1a1a2e}
     <div class="lsub">লগইন করুন — যেকোনো ডিভাইস থেকে ডেটা দেখুন</div>
 
     <div id="loginForm">
-      <div class="lfg"><label>Gmail</label><input type="email" id="lemail" placeholder="your@gmail.com" inputmode="email"></div>
-      <div class="lfg"><label>পাসওয়ার্ড</label><input type="password" id="lpass" placeholder="••••••••"></div>
-      <button class="lbtn" id="loginBtn">লগইন করুন</button>
+      <div class="lfg"><label>Gmail</label><input type="email" id="lemail" placeholder="your@gmail.com" inputmode="email" autocomplete="email"></div>
+      <div class="lfg"><label>পাসওয়ার্ড</label><input type="password" id="lpass" placeholder="••••••••" autocomplete="current-password"></div>
+      <button class="lbtn" id="loginBtnEl" onclick="doLoginClick()">লগইন করুন</button>
       <div class="lerr" id="lerr"></div>
-      <div class="ltoggle">নতুন? <a id="toRegister">রেজিস্ট্রেশন করুন</a></div>
+      <div class="ltoggle">নতুন? <a style="color:var(--teal);cursor:pointer;font-weight:700" onclick="showRegister()">রেজিস্ট্রেশন করুন</a></div>
     </div>
 
     <div id="registerForm" style="display:none">
-      <div class="lfg"><label>আপনার নাম</label><input type="text" id="rname" placeholder="নাম লিখুন"></div>
-      <div class="lfg"><label>Gmail</label><input type="email" id="remail" placeholder="your@gmail.com" inputmode="email"></div>
-      <div class="lfg"><label>পাসওয়ার্ড</label><input type="password" id="rpass" placeholder="কমপক্ষে ৬ অক্ষর"></div>
-      <button class="lbtn" id="registerBtn">রেজিস্ট্রেশন করুন</button>
+      <div class="lfg"><label>আপনার নাম</label><input type="text" id="rname" placeholder="নাম লিখুন" autocomplete="name"></div>
+      <div class="lfg"><label>Gmail</label><input type="email" id="remail" placeholder="your@gmail.com" inputmode="email" autocomplete="email"></div>
+      <div class="lfg"><label>পাসওয়ার্ড</label><input type="password" id="rpass" placeholder="কমপক্ষে ৬ অক্ষর" autocomplete="new-password"></div>
+      <button class="lbtn" id="registerBtnEl" onclick="doRegisterClick()">রেজিস্ট্রেশন করুন</button>
       <div class="lerr" id="rerr"></div>
-      <div class="ltoggle">আগেই আছেন? <a id="toLogin">লগইন করুন</a></div>
+      <div class="ltoggle">আগেই আছেন? <a style="color:var(--teal);cursor:pointer;font-weight:700" onclick="showLogin()">লগইন করুন</a></div>
     </div>
   </div>
 </div>
@@ -448,13 +448,15 @@ async function fsGet(col, id) {
 let IDB;
 function openIDB() {
   return new Promise((res,rej) => {
-    const r=indexedDB.open('HisabV5',1);
+    const r=indexedDB.open('HisabV5',2);
     r.onupgradeneeded=e=>{
       const db=e.target.result;
-      ['expenses','pending','network'].forEach(s=>{
+      ['expenses','pending'].forEach(s=>{
         if(!db.objectStoreNames.contains(s))
           db.createObjectStore(s,{keyPath:'lid',autoIncrement:true});
       });
+      if(!db.objectStoreNames.contains('network'))
+        db.createObjectStore('network',{keyPath:'phone'});
     };
     r.onsuccess=e=>{IDB=e.target.result;res();};
     r.onerror=()=>rej();
@@ -462,67 +464,76 @@ function openIDB() {
 }
 const tx=(s,m)=>IDB.transaction(s,m).objectStore(s);
 const iAll=s=>new Promise(r=>{const q=tx(s,'readonly').getAll();q.onsuccess=()=>r(q.result);q.onerror=()=>r([]);});
-const iAdd=(s,d)=>new Promise((r,j)=>{const q=tx(s,'readwrite').add(d);q.onsuccess=()=>r(q.result);q.onerror=()=>j();});
+const iAdd=(s,d)=>new Promise((r,j)=>{
+  const clean={...d};delete clean.lid;delete clean.fbId;
+  const q=tx(s,'readwrite').add(clean);
+  q.onsuccess=()=>r(q.result);
+  q.onerror=e=>{console.warn('iAdd error',e);j(e);}
+});
 const iPut=(s,d)=>new Promise(r=>{tx(s,'readwrite').put(d);r();});
 const iDel=(s,k)=>new Promise(r=>{tx(s,'readwrite').delete(k);r();});
 const iClr=s=>new Promise(r=>{tx(s,'readwrite').clear();r();});
 const iGet=(s,k)=>new Promise(r=>{const q=tx(s,'readonly').get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null);});
 
 // ══════════════════════════════
-// LOGIN UI
+// LOGIN UI — Global Functions
 // ══════════════════════════════
-document.getElementById('toRegister').onclick=()=>{
+function showRegister(){
   document.getElementById('loginForm').style.display='none';
   document.getElementById('registerForm').style.display='block';
-};
-document.getElementById('toLogin').onclick=()=>{
+  document.getElementById('lerr').classList.remove('show');
+}
+function showLogin(){
   document.getElementById('registerForm').style.display='none';
   document.getElementById('loginForm').style.display='block';
-};
+  document.getElementById('rerr').classList.remove('show');
+}
 
-document.getElementById('loginBtn').onclick=async function() {
+async function doLoginClick(){
   const email=document.getElementById('lemail').value.trim();
   const pass=document.getElementById('lpass').value;
   const err=document.getElementById('lerr');
+  err.classList.remove('show');
   if(!email||!pass){err.textContent='Email ও Password দিন';err.classList.add('show');return;}
-  this.innerHTML='<span class="spin"></span>লগইন হচ্ছে...';this.disabled=true;
-  try {
+  const btn=document.getElementById('loginBtnEl');
+  btn.innerHTML='<span class="spin"></span>লগইন হচ্ছে...';btn.disabled=true;
+  try{
     USER=await doLogin(email,pass);
     saveUser();
     showApp();
-  } catch(e) {
-    let msg='লগইন ব্যর্থ। Email ও Password চেক করুন।';
-    if(e.message.includes('INVALID')) msg='Email বা Password ভুল।';
-    if(e.message.includes('TOO_MANY')) msg='অনেকবার চেষ্টা করেছেন। একটু পরে আবার করুন।';
+  }catch(e){
+    let msg='লগইন ব্যর্থ। আবার চেষ্টা করুন।';
+    if(e.message.includes('INVALID')||e.message.includes('PASSWORD')) msg='Email বা Password ভুল।';
+    if(e.message.includes('TOO_MANY')) msg='অনেকবার চেষ্টা। একটু পরে আবার করুন।';
+    if(e.message.includes('USER_NOT_FOUND')) msg='Email পাওয়া যায়নি। রেজিস্ট্রেশন করুন।';
     err.textContent=msg;err.classList.add('show');
+    btn.innerHTML='লগইন করুন';btn.disabled=false;
   }
-  this.innerHTML='লগইন করুন';this.disabled=false;
-};
+}
 
-document.getElementById('registerBtn').onclick=async function() {
+async function doRegisterClick(){
   const name=document.getElementById('rname').value.trim();
   const email=document.getElementById('remail').value.trim();
   const pass=document.getElementById('rpass').value;
   const err=document.getElementById('rerr');
+  err.classList.remove('show');
   if(!name||!email||!pass){err.textContent='সব তথ্য দিন';err.classList.add('show');return;}
-  if(pass.length<6){err.textContent='Password কমপক্ষে ৬ অক্ষর';err.classList.add('show');return;}
-  this.innerHTML='<span class="spin"></span>রেজিস্ট্রেশন হচ্ছে...';this.disabled=true;
-  try {
+  if(pass.length<6){err.textContent='Password কমপক্ষে ৬ অক্ষর হতে হবে';err.classList.add('show');return;}
+  const btn=document.getElementById('registerBtnEl');
+  btn.innerHTML='<span class="spin"></span>রেজিস্ট্রেশন হচ্ছে...';btn.disabled=true;
+  try{
     USER=await doRegister(email,pass,name);
     saveUser();
     showApp();
-  } catch(e) {
+  }catch(e){
     let msg='রেজিস্ট্রেশন ব্যর্থ।';
     if(e.message.includes('EMAIL_EXISTS')) msg='এই Email আগেই আছে। লগইন করুন।';
-    if(e.message.includes('WEAK_PASSWORD')) msg='Password অনেক দুর্বল।';
+    if(e.message.includes('WEAK_PASSWORD')) msg='Password আরো শক্তিশালী করুন।';
+    if(e.message.includes('INVALID_EMAIL')) msg='Email সঠিক নয়।';
     err.textContent=msg;err.classList.add('show');
+    btn.innerHTML='রেজিস্ট্রেশন করুন';btn.disabled=false;
   }
-  this.innerHTML='রেজিস্ট্রেশন করুন';this.disabled=false;
-};
-
-// Enter key support
-['lpass','lemail'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginBtn').click();}));
-['rpass','remail','rname'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('registerBtn').click();}));
+}
 
 // ══════════════════════════════
 // SHOW APP
@@ -586,16 +597,19 @@ async function loadData() {
     // Replace local with Firebase data
     await iClr('expenses');
     for(const r of remote) {
-      const d={...r,lid:undefined};delete d.lid;
-      await iAdd('expenses',d);
+      try { await iAdd('expenses', r); } catch(e){ console.warn('skip',e); }
     }
-    DATA=remote.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    DATA=remote.sort((a,b)=>(Number(b.createdAt)||0)-(Number(a.createdAt)||0));
     renderAll();
-    document.getElementById('totCnt').textContent=DATA.length+' টি';
     // Load network
     const net=await fsAll(uCol('network'));
     await iClr('network');
-    for(const n of net){if(n.phone){NET[n.phone]=n.name;await iAdd('network',{lid:undefined,...n});}}
+    for(const n of net){
+      if(n.phone){
+        NET[n.phone]=n.name;
+        try{ await iPut('network',{phone:n.phone,name:n.name||''}); }catch(e){}
+      }
+    }
   } catch(e){ console.warn(e); toast('⚠️ '+e.message,'er'); }
 }
 
@@ -603,6 +617,7 @@ function renderAll() {
   renderHistory();
   renderSummary();
   if(CUR_L) renderLoan(CUR_L);
+  document.getElementById('totCnt').textContent = DATA.length + ' টি';
 }
 
 // ══════════════════════════════
@@ -695,33 +710,34 @@ document.getElementById('saveBtn').onclick=async function(){
   this.innerHTML='<span class="spin"></span>সেভ হচ্ছে...';this.disabled=true;
 
   const now=new Date();
+  const mKey=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
   const entry={
     dateTime:now.toLocaleString('bn-BD',{timeZone:'Asia/Dhaka'}),
     dateTimeISO:now.toISOString(),
-    monthKey:now.toISOString().slice(0,7),
+    monthKey:mKey,
     createdAt:now.getTime(),
-    category:cat,name,phone,
-    takeAmount:take,giveAmount:give,reason
+    category:cat,name:name||'',phone:phone||'',
+    takeAmount:take,giveAmount:give,reason:reason||''
   };
 
-  // Save local
-  const lid=await iAdd('expenses',{...entry});
-  DATA.unshift({...entry,lid});
+  // Save local first
+  const lid=await iAdd('expenses', entry);
+  DATA.unshift({...entry, lid});
   document.getElementById('totCnt').textContent=DATA.length+' টি';
 
   if(navigator.onLine){
     try{
       await doRefresh();
-      const fbId=await fsAdd(uCol('expenses'),entry);
+      const fbId=await fsAdd(uCol('expenses'), entry);
       if(phone&&name) await fsSet(uCol('network'),phone,{name,phone});
-      NET[phone]=name;
+      if(phone) NET[phone]=name;
       toast('✅ Firebase এ সেভ হয়েছে!','ok');
     }catch(e){
-      await iAdd('pending',{...entry,lid});
+      await iAdd('pending', entry);
       toast('📴 অফলাইনে সেভ, পরে সিঙ্ক হবে','in');
     }
   } else {
-    await iAdd('pending',{...entry,lid});
+    await iAdd('pending', entry);
     toast('📴 অফলাইনে সেভ হয়েছে','in');
   }
 
@@ -800,12 +816,19 @@ function buildMonths(){
     s.appendChild(o);
   }
 }
+function getMonthKey(e){
+  if(e.monthKey && e.monthKey.length===7) return e.monthKey;
+  if(e.dateTimeISO) return e.dateTimeISO.slice(0,7);
+  if(e.createdAt){
+    const d=new Date(Number(e.createdAt));
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+  }
+  return '';
+}
 function renderSummary(){
   const m=document.getElementById('mSel').value;
-  const rows=DATA.filter(e=>{
-    const mk=e.monthKey||(e.dateTimeISO?e.dateTimeISO.slice(0,7):'');
-    return mk===m;
-  });
+  if(!m) return;
+  const rows=DATA.filter(e=>getMonthKey(e)===m);
   let inc=0,exp=0,pay=0;const cats={};
   for(const e of rows){
     const c=e.category,tk=Number(e.takeAmount)||0,gv=Number(e.giveAmount)||0;
@@ -887,7 +910,7 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=function(){
   this.classList.add('act');
   document.getElementById('page-'+this.dataset.p).classList.add('act');
   const p=this.dataset.p;
-  if(p==='summary')renderSummary();
+  if(p==='summary'){buildMonths();renderSummary();}
   if(p==='history')renderHistory();
   if(p==='loan'&&CUR_L)renderLoan(CUR_L);
 });

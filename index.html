@@ -501,48 +501,63 @@ function showLogin(){
 }
 
 async function doLoginClick(){
-  const email=document.getElementById('lemail').value.trim();
-  const pass=document.getElementById('lpass').value;
+  const emailEl=document.getElementById('lemail');
+  const passEl=document.getElementById('lpass');
   const err=document.getElementById('lerr');
   err.classList.remove('show');
-  if(!email||!pass){err.textContent='Email ও Password দিন';err.classList.add('show');return;}
+  const email=(emailEl?emailEl.value:'').trim();
+  const pass=passEl?passEl.value:'';
+  if(!email||!pass){
+    err.textContent='Email ও Password দিন';
+    err.classList.add('show');
+    return;
+  }
   const btn=document.getElementById('loginBtnEl');
-  btn.innerHTML='<span class="spin"></span>লগইন হচ্ছে...';btn.disabled=true;
+  if(btn){btn.textContent='লগইন হচ্ছে...';btn.disabled=true;}
   try{
     USER=await doLogin(email,pass);
     saveUser();
     showApp();
   }catch(e){
-    let msg='লগইন ব্যর্থ। আবার চেষ্টা করুন।';
-    if(e.message.includes('INVALID')||e.message.includes('PASSWORD')) msg='Email বা Password ভুল।';
+    console.error('Login error:',e);
+    let msg='লগইন ব্যর্থ: '+e.message;
+    if(e.message.includes('INVALID_LOGIN_CREDENTIALS')||e.message.includes('INVALID_PASSWORD')||e.message.includes('EMAIL_NOT_FOUND')) msg='Email বা Password ভুল।';
     if(e.message.includes('TOO_MANY')) msg='অনেকবার চেষ্টা। একটু পরে আবার করুন।';
     if(e.message.includes('USER_NOT_FOUND')) msg='Email পাওয়া যায়নি। রেজিস্ট্রেশন করুন।';
-    err.textContent=msg;err.classList.add('show');
-    btn.innerHTML='লগইন করুন';btn.disabled=false;
+    if(!navigator.onLine) msg='ইন্টারনেট সংযোগ নেই।';
+    err.textContent=msg;
+    err.classList.add('show');
+    if(btn){btn.textContent='লগইন করুন';btn.disabled=false;}
   }
 }
 
 async function doRegisterClick(){
-  const name=document.getElementById('rname').value.trim();
-  const email=document.getElementById('remail').value.trim();
-  const pass=document.getElementById('rpass').value;
+  const nameEl=document.getElementById('rname');
+  const emailEl=document.getElementById('remail');
+  const passEl=document.getElementById('rpass');
   const err=document.getElementById('rerr');
   err.classList.remove('show');
+  const name=nameEl?nameEl.value.trim():'';
+  const email=emailEl?emailEl.value.trim():'';
+  const pass=passEl?passEl.value:'';
   if(!name||!email||!pass){err.textContent='সব তথ্য দিন';err.classList.add('show');return;}
   if(pass.length<6){err.textContent='Password কমপক্ষে ৬ অক্ষর হতে হবে';err.classList.add('show');return;}
+  if(!navigator.onLine){err.textContent='ইন্টারনেট সংযোগ নেই।';err.classList.add('show');return;}
   const btn=document.getElementById('registerBtnEl');
-  btn.innerHTML='<span class="spin"></span>রেজিস্ট্রেশন হচ্ছে...';btn.disabled=true;
+  if(btn){btn.textContent='রেজিস্ট্রেশন হচ্ছে...';btn.disabled=true;}
   try{
     USER=await doRegister(email,pass,name);
     saveUser();
     showApp();
   }catch(e){
-    let msg='রেজিস্ট্রেশন ব্যর্থ।';
+    console.error('Register error:',e);
+    let msg='রেজিস্ট্রেশন ব্যর্থ: '+e.message;
     if(e.message.includes('EMAIL_EXISTS')) msg='এই Email আগেই আছে। লগইন করুন।';
     if(e.message.includes('WEAK_PASSWORD')) msg='Password আরো শক্তিশালী করুন।';
     if(e.message.includes('INVALID_EMAIL')) msg='Email সঠিক নয়।';
-    err.textContent=msg;err.classList.add('show');
-    btn.innerHTML='রেজিস্ট্রেশন করুন';btn.disabled=false;
+    err.textContent=msg;
+    err.classList.add('show');
+    if(btn){btn.textContent='রেজিস্ট্রেশন করুন';btn.disabled=false;}
   }
 }
 
@@ -877,7 +892,7 @@ async function loadSummaryFromFirebase(){
   if(loading) loading.style.display='none';
 }
 function buildMonths(){}
-function renderSummary(){ loadSummaryFromFirebase(); }if(s.selectedIndex>0){s.selectedIndex--;renderSummary();}};
+function renderSummary(){ loadSummaryFromFirebase(); }
 
 // ══════════════════════════════
 // LOAN

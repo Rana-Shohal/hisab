@@ -163,7 +163,7 @@ select option{background:#1a1a2e}
   </div>
   <div class="tabs">
     <div class="tab act" data-p="form"><span class="ti">✏️</span>এন্ট্রি</div>
-    <div class="tab" data-p="summary"><span class="ti">📊</span>সারসংক্ষেপ</div>
+    <div class="tab" data-p="summary"><span class="ti">📊</span>সামারি</div>
     <div class="tab" data-p="loan"><span class="ti">💰</span>লোন</div>
     <div class="tab" data-p="history"><span class="ti">📋</span>ইতিহাস</div>
     <div class="tab" data-p="settings"><span class="ti">⚙️</span>সেটিং</div>
@@ -244,20 +244,31 @@ select option{background:#1a1a2e}
 
   <!-- SUMMARY -->
   <div id="page-summary" class="pg">
-    <div class="mp">
-      <button class="mn" id="mPrev">◀</button>
-      <select id="mSel"></select>
-      <button class="mn" id="mNext">▶</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-size:16px;font-weight:800">সামারি</div>
+      <button class="btn-o btn-s btn" id="sumRefBtn" style="padding:7px 14px;font-size:13px">🔄 রিফ্রেশ</button>
     </div>
+    <div id="sumLoading" style="text-align:center;padding:30px;color:var(--mut);display:none">
+      <span class="spin" style="border-top-color:var(--teal)"></span> Firebase থেকে লোড হচ্ছে...
+    </div>
+    <!-- কার্ড -->
     <div class="sg">
       <div class="sc"><div class="sla">💵 মোট আয়</div><div class="sa i" id="sI">৳০</div></div>
       <div class="sc"><div class="sla">💸 মোট খরচ</div><div class="sa e" id="sE">৳০</div></div>
     </div>
     <div class="sg">
-      <div class="sc"><div class="sla">💵 Paycheck</div><div class="sa p" id="sP">৳০</div></div>
-      <div class="sc"><div class="sla">💰 ব্যালেন্স</div><div class="sa b" id="sB">৳০</div></div>
+      <div class="sc" style="grid-column:span 2"><div class="sla">💰 ব্যালেন্স</div><div class="sa b" id="sB" style="font-size:28px">৳০</div></div>
     </div>
-    <div class="card"><div class="ctit">ক্যাটাগরি ভিত্তিক</div><div id="bdown"></div></div>
+    <!-- ক্যাটাগরি -->
+    <div class="card">
+      <div class="ctit">ক্যাটাগরি ভিত্তিক</div>
+      <div id="catBreak"></div>
+    </div>
+    <!-- সাম্প্রতিক এন্ট্রি -->
+    <div class="card">
+      <div class="ctit">সাম্প্রতিক এন্ট্রি</div>
+      <div id="recentList"></div>
+    </div>
   </div>
 
   <!-- LOAN -->
@@ -615,7 +626,6 @@ async function loadData() {
 
 function renderAll() {
   renderHistory();
-  renderSummary();
   if(CUR_L) renderLoan(CUR_L);
   document.getElementById('totCnt').textContent = DATA.length + ' টি';
 }
@@ -805,52 +815,69 @@ function openSMS(e){
 // ══════════════════════════════
 // SUMMARY
 // ══════════════════════════════
-function buildMonths(){
-  const s=document.getElementById('mSel');s.innerHTML='';
-  const now=new Date();
-  for(let i=0;i<24;i++){
-    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
-    const o=document.createElement('option');
-    o.value=d.toISOString().slice(0,7);
-    o.textContent=d.toLocaleString('bn-BD',{month:'long',year:'numeric'});
-    s.appendChild(o);
+// ══════════════════════════════
+// SUMMARY — Firebase থেকে সরাসরি
+// ══════════════════════════════
+async function loadSummaryFromFirebase(){
+  const loading=document.getElementById('sumLoading');
+  if(loading) loading.style.display='block';
+  try{
+    if(navigator.onLine) await doRefresh();
+    const remote=navigator.onLine ? await fsAll(uCol('expenses')) : DATA;
+    const INCOME=['Paycheck','Loan repaid'];
+    let inc=0,exp=0;
+    const cats={};
+    for(const e of remote){
+      const c=e.category||'';
+      const tk=Number(e.takeAmount)||0;
+      const gv=Number(e.giveAmount)||0;
+      if(INCOME.includes(c)) inc+=tk;
+      else exp+=gv;
+      const a=tk+gv;
+      if(a>0) cats[c]=(cats[c]||0)+a;
+    }
+    const bal=inc-exp;
+    document.getElementById('sI').textContent='৳'+inc.toLocaleString('bn-BD');
+    document.getElementById('sE').textContent='৳'+exp.toLocaleString('bn-BD');
+    document.getElementById('sB').textContent='৳'+bal.toLocaleString('bn-BD');
+    document.getElementById('sB').style.color=bal>=0?'var(--grn)':'var(--red)';
+    // ক্যাটাগরি
+    const catEl=document.getElementById('catBreak');
+    const ents=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+    catEl.innerHTML=ents.length?ents.map(([c,a])=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bdr)">
+        <span style="font-size:14px">${c}</span>
+        <span style="font-weight:800;color:var(--teal);font-size:15px">৳${a.toLocaleString('bn-BD')}</span>
+      </div>`).join('')
+      :'<div style="color:var(--mut);font-size:13px;padding:10px;text-align:center">কোনো এন্ট্রি নেই</div>';
+    // সাম্প্রতিক
+    const INCOME2=['Paycheck','Loan repaid'];
+    const recent=[...remote].sort((a,b)=>(Number(b.createdAt)||0)-(Number(a.createdAt)||0)).slice(0,10);
+    const recEl=document.getElementById('recentList');
+    recEl.innerHTML=recent.length?recent.map(e=>{
+      const isI=INCOME2.includes(e.category);
+      const amt=isI?Number(e.takeAmount)||0:Number(e.giveAmount)||0;
+      const col=isI?'var(--grn)':'var(--red)';
+      const sign=isI?'+':'-';
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bdr)">
+        <div>
+          <div style="font-size:13px;font-weight:700">${e.category}</div>
+          <div style="font-size:11px;color:var(--mut);margin-top:2px">${e.name||''}${e.dateTime?' · '+e.dateTime:''}</div>
+        </div>
+        <span style="font-weight:800;font-size:15px;color:${col}">${sign}৳${amt.toLocaleString('bn-BD')}</span>
+      </div>`;
+    }).join('')
+    :'<div style="color:var(--mut);font-size:13px;text-align:center;padding:8px">কোনো এন্ট্রি নেই</div>';
+    if(navigator.onLine){ DATA=remote; renderHistory(); if(CUR_L)renderLoan(CUR_L); }
+  }catch(e){
+    console.error(e);
+    const catEl=document.getElementById('catBreak');
+    if(catEl) catEl.innerHTML=`<div style="color:var(--red);font-size:13px;padding:10px;text-align:center">❌ ${e.message}</div>`;
   }
+  if(loading) loading.style.display='none';
 }
-function getMonthKey(e){
-  if(e.monthKey && e.monthKey.length===7) return e.monthKey;
-  if(e.dateTimeISO) return e.dateTimeISO.slice(0,7);
-  if(e.createdAt){
-    const d=new Date(Number(e.createdAt));
-    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-  }
-  return '';
-}
-function renderSummary(){
-  const m=document.getElementById('mSel').value;
-  if(!m) return;
-  const rows=DATA.filter(e=>getMonthKey(e)===m);
-  let inc=0,exp=0,pay=0;const cats={};
-  for(const e of rows){
-    const c=e.category,tk=Number(e.takeAmount)||0,gv=Number(e.giveAmount)||0;
-    if(c==='Paycheck'){inc+=tk;pay+=tk;}
-    else if(c==='Loan repaid') inc+=tk;
-    else exp+=gv;
-    const a=tk+gv;if(a>0)cats[c]=(cats[c]||0)+a;
-  }
-  const bal=inc-exp;
-  document.getElementById('sI').textContent='৳'+inc.toLocaleString('bn-BD');
-  document.getElementById('sE').textContent='৳'+exp.toLocaleString('bn-BD');
-  document.getElementById('sP').textContent='৳'+pay.toLocaleString('bn-BD');
-  document.getElementById('sB').textContent='৳'+bal.toLocaleString('bn-BD');
-  document.getElementById('sB').style.color=bal>=0?'var(--grn)':'var(--red)';
-  const bd=document.getElementById('bdown');
-  const ents=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
-  if(!ents.length){bd.innerHTML='<div style="color:var(--mut);font-size:13px;padding:8px 0">এই মাসে কোনো এন্ট্রি নেই</div>';return;}
-  bd.innerHTML=ents.map(([c,a])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr)"><span style="font-size:14px">${c}</span><span style="font-weight:700;color:var(--teal)">৳${a.toLocaleString('bn-BD')}</span></div>`).join('');
-}
-document.getElementById('mSel').onchange=renderSummary;
-document.getElementById('mPrev').onclick=()=>{const s=document.getElementById('mSel');if(s.selectedIndex<s.options.length-1){s.selectedIndex++;renderSummary();}};
-document.getElementById('mNext').onclick=()=>{const s=document.getElementById('mSel');if(s.selectedIndex>0){s.selectedIndex--;renderSummary();}};
+function buildMonths(){}
+function renderSummary(){ loadSummaryFromFirebase(); }if(s.selectedIndex>0){s.selectedIndex--;renderSummary();}};
 
 // ══════════════════════════════
 // LOAN
@@ -910,7 +937,7 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=function(){
   this.classList.add('act');
   document.getElementById('page-'+this.dataset.p).classList.add('act');
   const p=this.dataset.p;
-  if(p==='summary'){buildMonths();renderSummary();}
+  if(p==='summary') loadSummaryFromFirebase();
   if(p==='history')renderHistory();
   if(p==='loan'&&CUR_L)renderLoan(CUR_L);
 });
